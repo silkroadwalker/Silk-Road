@@ -1,0 +1,49 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# Maven build output
+target/
+
+# Compiled class files
+*.class
+
+# Spring Boot logs
+*.log
+
+# SQLite database file — this is generated data, not source code
+# Each teammate/evaluator running the project fresh will get their own market.db
+*.db
+*.sqlite
+*.sqlite3
+market.db
