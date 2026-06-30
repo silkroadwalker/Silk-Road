@@ -1,6 +1,8 @@
 package com.silkroad.market.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class SignupRequest {
@@ -10,6 +12,7 @@ public class SignupRequest {
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 30, message = "Username must be 3-30 characters")
+    @Pattern(regexp = "^[a-z0-9]+$", message = "Username can only contain lowercase letters and numbers")
     private String username;
 
     @NotBlank(message = "Password is required")
@@ -17,8 +20,10 @@ public class SignupRequest {
     private String password;
 
     @NotBlank(message = "Phone is required")
+    @Pattern(regexp = "^09\\d{9}$", message = "Phone must be a valid Iranian mobile number (e.g. 09123456789)")
     private String phone;
 
+    @Email(message = "Invalid email format")
     private String email;
 
     public String getFullName() {

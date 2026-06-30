@@ -31,3 +31,19 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Maven build output
+target/
+
+# Compiled class files
+*.class
+
+# Spring Boot logs
+*.log
+
+# SQLite database file — this is generated data, not source code
+# Each teammate/evaluator running the project fresh will get their own market.db
+*.db
+*.sqlite
+*.sqlite3
+market.db
