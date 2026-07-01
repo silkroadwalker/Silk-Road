@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.silkroad.market.dto.AuthResponse;
-import com.silkroad.market.dto.LoginRequest;
-import com.silkroad.market.dto.SignupRequest;
+import com.silkroad.market.dto.authentication.AuthResponse;
+import com.silkroad.market.dto.authentication.LoginRequest;
+import com.silkroad.market.dto.authentication.SignupRequest;
 import com.silkroad.market.service.AuthService;
 
 import jakarta.validation.Valid;
