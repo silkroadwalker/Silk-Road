@@ -41,8 +41,15 @@ public class SecurityConfig {
                                 "/v3/api-docs/**")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/ads/**").permitAll()
+                        // Admin category management
+                        .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/ads/**").permitAll()
                         .anyRequest().authenticated())
 
                 .addFilterBefore(
