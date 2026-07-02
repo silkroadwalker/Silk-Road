@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.circlemarketplace.ui.LoginController">
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+
+    <Label text="CircleMarket" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <Label text="Login to your account"/>
+
+    <TextField fx:id="usernameField" promptText="Username" maxWidth="250"/>
+    <PasswordField fx:id="passwordField" promptText="Password" maxWidth="250"/>
+
+    <Label fx:id="errorLabel" style="-fx-text-fill: red;" visible="false"/>
+
+    <Button fx:id="loginButton" text="Log In" onAction="#handleLogin" maxWidth="250"/>
+    <Hyperlink fx:id="registerLink" text="Don't have an account? Register"/>
+</VBox>
