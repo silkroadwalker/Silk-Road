@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="12" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.circlemarketplace.ui.SignupController">
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+
+    <Label text="Create Account" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="fullNameField" promptText="Full Name" maxWidth="280"/>
+    <TextField fx:id="usernameField" promptText="Username" maxWidth="280"/>
+    <TextField fx:id="emailField" promptText="Email" maxWidth="280"/>
+    <TextField fx:id="phoneField" promptText="Phone" maxWidth="280"/>
+    <PasswordField fx:id="passwordField" promptText="Password" maxWidth="280"/>
+
+    <Label fx:id="errorLabel" style="-fx-text-fill: red;" visible="false" wrapText="true" maxWidth="280"/>
+
+    <Button fx:id="signupButton" text="Sign Up" onAction="#handleSignup" maxWidth="280"/>
+</VBox>
