@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.entity.Advertisement;
 import com.silkroad.market.entity.AdvertisementImage;
+import com.silkroad.market.entity.AdvertisementStatus;
 import com.silkroad.market.entity.Category;
 import com.silkroad.market.entity.User;
 import com.silkroad.market.exception.ApiException;
@@ -88,5 +90,19 @@ public class AdvertisementService {
         }
 
         return advertisementRepository.save(advertisement);
+    }
+
+    public List<AdvertisementSummaryResponse> getPendingAdvertisements() {
+
+        return advertisementRepository.findByStatus(AdvertisementStatus.PENDING)
+                .stream()
+                .map(ad -> new AdvertisementSummaryResponse(
+                        ad.getId(),
+                        ad.getTitle(),
+                        ad.getPrice(),
+                        ad.getSeller().getUsername(),
+                        ad.getCategory().getName(),
+                        ad.getStatus()))
+                .toList();
     }
 }
