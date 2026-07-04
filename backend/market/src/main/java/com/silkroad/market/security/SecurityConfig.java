@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/ads/**").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
 
                 .addFilterBefore(
                         jwtAuthenticationFilter,

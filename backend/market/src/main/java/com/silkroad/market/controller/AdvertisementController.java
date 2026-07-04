@@ -1,12 +1,18 @@
 package com.silkroad.market.controller;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.service.AdvertisementService;
@@ -14,7 +20,6 @@ import com.silkroad.market.service.AdvertisementService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
-@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/ads")
 public class AdvertisementController {
@@ -25,10 +30,12 @@ public class AdvertisementController {
         this.advertisementService = advertisementService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<String> createAdvertisement(
             Authentication authentication,
-            @Valid @RequestBody CreateAdvertisementRequest request) {
+            @Valid @ModelAttribute CreateAdvertisementRequest request)
+            throws IOException {
 
         advertisementService.createAdvertisement(
                 request,

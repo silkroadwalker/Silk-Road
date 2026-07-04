@@ -1,10 +1,16 @@
 package com.silkroad.market.service;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.entity.Advertisement;
+import com.silkroad.market.entity.AdvertisementImage;
 import com.silkroad.market.entity.Category;
 import com.silkroad.market.entity.User;
 import com.silkroad.market.exception.ApiException;
@@ -18,29 +24,40 @@ public class AdvertisementService {
     private final AdvertisementRepository advertisementRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final ImageStorageService imageStorageService;
 
     public AdvertisementService(
             AdvertisementRepository advertisementRepository,
             CategoryRepository categoryRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            ImageStorageService imageStorageService) {
 
         this.advertisementRepository = advertisementRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.imageStorageService = imageStorageService;
     }
 
-    public void createAdvertisement(CreateAdvertisementRequest request,
-            String username) {
+    // todo: Right now, if saving the third image fails:
+
+    // image1 ✔
+    // image2 ✔
+    // image3 ❌
+
+    // the database transaction rolls back because of @Transactional, but the first
+    // two image files remain on disk.
+    @Transactional
+    public Advertisement createAdvertisement(
+            CreateAdvertisementRequest request,
+            String username) throws IOException {
+
+        List<MultipartFile> images = request.getImages();
 
         User seller = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ApiException(
-                        "User not found",
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ApiException(
-                        "Category not found",
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ApiException("Category not found", HttpStatus.NOT_FOUND));
 
         Advertisement advertisement = new Advertisement();
 
@@ -51,6 +68,25 @@ public class AdvertisementService {
         advertisement.setSeller(seller);
         advertisement.setCategory(category);
 
-        advertisementRepository.save(advertisement);
+        if (images != null) {
+
+            for (MultipartFile file : images) {
+
+                if (file.isEmpty()) {
+                    continue;
+                }
+
+                String fileName = imageStorageService.saveImage(file);
+
+                AdvertisementImage image = new AdvertisementImage();
+
+                image.setFileName(fileName);
+                image.setAdvertisement(advertisement);
+
+                advertisement.getImages().add(image);
+            }
+        }
+
+        return advertisementRepository.save(advertisement);
     }
 }
