@@ -47,3 +47,4 @@ target/
 *.sqlite
 *.sqlite3
 market.db
+uploads/

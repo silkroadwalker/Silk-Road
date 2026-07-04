@@ -4,14 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.silkroad.market.dto.AuthResponse;
-import com.silkroad.market.dto.LoginRequest;
-import com.silkroad.market.dto.SignupRequest;
+import com.silkroad.market.dto.authentication.AuthResponse;
+import com.silkroad.market.dto.authentication.LoginRequest;
+import com.silkroad.market.dto.authentication.SignupRequest;
 import com.silkroad.market.entity.Role;
 import com.silkroad.market.entity.User;
 import com.silkroad.market.entity.UserStatus;
 import com.silkroad.market.exception.ApiException;
 import com.silkroad.market.repository.UserRepository;
+import com.silkroad.market.security.JwtService;
 
 @Service
 public class AuthService {

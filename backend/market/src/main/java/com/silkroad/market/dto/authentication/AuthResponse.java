@@ -1,4 +1,4 @@
-package com.silkroad.market.dto;
+package com.silkroad.market.dto.authentication;
 
 import com.silkroad.market.entity.Role;
 
