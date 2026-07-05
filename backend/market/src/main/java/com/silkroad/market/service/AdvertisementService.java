@@ -25,155 +25,204 @@ import com.silkroad.market.repository.UserRepository;
 @Service
 public class AdvertisementService {
 
-    private final AdvertisementRepository advertisementRepository;
-    private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
-    private final ImageStorageService imageStorageService;
+        private final AdvertisementRepository advertisementRepository;
+        private final CategoryRepository categoryRepository;
+        private final UserRepository userRepository;
+        private final ImageStorageService imageStorageService;
 
-    public AdvertisementService(
-            AdvertisementRepository advertisementRepository,
-            CategoryRepository categoryRepository,
-            UserRepository userRepository,
-            ImageStorageService imageStorageService) {
+        public AdvertisementService(
+                        AdvertisementRepository advertisementRepository,
+                        CategoryRepository categoryRepository,
+                        UserRepository userRepository,
+                        ImageStorageService imageStorageService) {
 
-        this.advertisementRepository = advertisementRepository;
-        this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
-        this.imageStorageService = imageStorageService;
-    }
+                this.advertisementRepository = advertisementRepository;
+                this.categoryRepository = categoryRepository;
+                this.userRepository = userRepository;
+                this.imageStorageService = imageStorageService;
+        }
 
-    // todo: Right now, if saving the third image fails:
+        // todo: Right now, if saving the third image fails:
 
-    // image1 ✔
-    // image2 ✔
-    // image3 ❌
+        // image1 ✔
+        // image2 ✔
+        // image3 ❌
 
-    // the database transaction rolls back because of @Transactional, but the first
-    // two image files remain on disk.
-    @Transactional
-    public Advertisement createAdvertisement(
-            CreateAdvertisementRequest request,
-            String username) throws IOException {
+        // the database transaction rolls back because of @Transactional, but the first
+        // two image files remain on disk.
+        @Transactional
+        public Advertisement createAdvertisement(
+                        CreateAdvertisementRequest request,
+                        String username) throws IOException {
 
-        List<MultipartFile> images = request.getImages();
+                List<MultipartFile> images = request.getImages();
 
-        User seller = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+                User seller = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ApiException("Category not found", HttpStatus.NOT_FOUND));
+                Category category = categoryRepository.findById(request.getCategoryId())
+                                .orElseThrow(() -> new ApiException("Category not found", HttpStatus.NOT_FOUND));
 
-        Advertisement advertisement = new Advertisement();
+                Advertisement advertisement = new Advertisement();
 
-        advertisement.setTitle(request.getTitle());
-        advertisement.setDescription(request.getDescription());
-        advertisement.setPrice(request.getPrice());
+                advertisement.setTitle(request.getTitle());
+                advertisement.setDescription(request.getDescription());
+                advertisement.setPrice(request.getPrice());
 
-        advertisement.setSeller(seller);
-        advertisement.setCategory(category);
+                advertisement.setSeller(seller);
+                advertisement.setCategory(category);
 
-        if (images != null) {
+                if (images != null) {
 
-            for (MultipartFile file : images) {
+                        for (MultipartFile file : images) {
 
-                if (file.isEmpty()) {
-                    continue;
+                                if (file.isEmpty()) {
+                                        continue;
+                                }
+
+                                String fileName = imageStorageService.saveImage(file);
+
+                                AdvertisementImage image = new AdvertisementImage();
+
+                                image.setFileName(fileName);
+                                image.setAdvertisement(advertisement);
+
+                                advertisement.getImages().add(image);
+                        }
                 }
 
-                String fileName = imageStorageService.saveImage(file);
-
-                AdvertisementImage image = new AdvertisementImage();
-
-                image.setFileName(fileName);
-                image.setAdvertisement(advertisement);
-
-                advertisement.getImages().add(image);
-            }
+                return advertisementRepository.save(advertisement);
         }
 
-        return advertisementRepository.save(advertisement);
-    }
+        public AdvertisementDetailedResponse getAdvertisementDetails(Long id) {
 
-    public List<AdvertisementSummaryResponse> getPendingAdvertisements() {
+                Advertisement ad = advertisementRepository.findById(id)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
 
-        return advertisementRepository.findByStatus(AdvertisementStatus.PENDING)
-                .stream()
-                .map(ad -> new AdvertisementSummaryResponse(
-                        ad.getId(),
-                        ad.getTitle(),
-                        ad.getPrice(),
-                        ad.getSeller().getUsername(),
-                        ad.getCategory().getName(),
-                        ad.getStatus()))
-                .toList();
-    }
+                List<String> imageUrls = ad.getImages()
+                                .stream()
+                                .map(image -> "/api/ads/images/" + image.getId())
+                                .toList();
 
-    public AdvertisementDetailedResponse getAdvertisementDetails(Long id) {
-
-        Advertisement ad = advertisementRepository.findById(id)
-                .orElseThrow(() -> new ApiException(
-                        "Advertisement not found",
-                        HttpStatus.NOT_FOUND));
-
-        List<String> imageUrls = ad.getImages()
-                .stream()
-                .map(image -> "/api/ads/images/" + image.getId())
-                .toList();
-
-        return new AdvertisementDetailedResponse(
-                ad.getId(),
-                ad.getTitle(),
-                ad.getDescription(),
-                ad.getPrice(),
-                ad.getSeller().getUsername(),
-                ad.getSeller().getFullName(),
-                ad.getSeller().getPhone(),
-                ad.getCategory().getName(),
-                ad.getStatus(),
-                ad.getCreatedAt(),
-                imageUrls);
-    }
-
-    public void approveAdvertisement(Long id) {
-
-        Advertisement advertisement = advertisementRepository.findById(id)
-                .orElseThrow(() -> new ApiException(
-                        "Advertisement not found",
-                        HttpStatus.NOT_FOUND));
-
-        if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
-            throw new ApiException(
-                    "Advertisement has already been reviewed",
-                    HttpStatus.BAD_REQUEST);
+                return new AdvertisementDetailedResponse(
+                                ad.getId(),
+                                ad.getTitle(),
+                                ad.getDescription(),
+                                ad.getPrice(),
+                                ad.getSeller().getUsername(),
+                                ad.getSeller().getFullName(),
+                                ad.getSeller().getPhone(),
+                                ad.getCategory().getName(),
+                                ad.getStatus(),
+                                ad.getRejectionReason(),
+                                ad.getCreatedAt(),
+                                imageUrls);
         }
 
-        advertisement.setStatus(AdvertisementStatus.APPROVED);
-        advertisement.setRejectionReason(null);
+        public AdvertisementDetailedResponse getAdvertisementDetails(
+                        Long id,
+                        AdvertisementStatus requiredStatus) {
 
-        advertisementRepository.save(advertisement);
-    }
+                Advertisement ad = advertisementRepository.findById(id)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
 
-    public void rejectAdvertisement(
-            Long id,
-            RejectAdvertisementRequest request) {
+                if (ad.getStatus() != requiredStatus) {
+                        throw new ApiException(
+                                        "Advertisement not found",
+                                        HttpStatus.NOT_FOUND);
+                }
 
-        Advertisement advertisement = advertisementRepository.findById(id)
-                .orElseThrow(() -> new ApiException(
-                        "Advertisement not found",
-                        HttpStatus.NOT_FOUND));
+                List<String> imageUrls = ad.getImages()
+                                .stream()
+                                .map(image -> "/api/ads/images/" + image.getId())
+                                .toList();
 
-        if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
-            throw new ApiException(
-                    "Advertisement has already been reviewed",
-                    HttpStatus.BAD_REQUEST);
+                return new AdvertisementDetailedResponse(
+                                ad.getId(),
+                                ad.getTitle(),
+                                ad.getDescription(),
+                                ad.getPrice(),
+                                ad.getSeller().getUsername(),
+                                ad.getSeller().getFullName(),
+                                ad.getSeller().getPhone(),
+                                ad.getCategory().getName(),
+                                ad.getStatus(),
+                                ad.getRejectionReason(),
+                                ad.getCreatedAt(),
+                                imageUrls);
         }
 
-        advertisement.setStatus(AdvertisementStatus.REJECTED);
-        advertisement.setRejectionReason(request.getReason());
+        public List<AdvertisementSummaryResponse> getAdvertisementsByStatus(
+                        AdvertisementStatus status) {
 
-        // todo: user should be notified of the rejection or approval of their ad
-        // or at least see their ads' status
+                return advertisementRepository.findByStatus(status)
+                                .stream()
+                                .map(this::toSummaryResponse)
+                                .toList();
+        }
 
-        advertisementRepository.save(advertisement);
-    }
+        private AdvertisementSummaryResponse toSummaryResponse(Advertisement ad) {
+
+                String thumbnailUrl = null;
+
+                if (!ad.getImages().isEmpty()) {
+                        thumbnailUrl = "/api/ads/images/" + ad.getImages().get(0).getId();
+                }
+
+                return new AdvertisementSummaryResponse(
+                                ad.getId(),
+                                ad.getTitle(),
+                                ad.getPrice(),
+                                ad.getSeller().getUsername(),
+                                ad.getCategory().getName(),
+                                ad.getStatus(),
+                                thumbnailUrl);
+        }
+
+        public void approveAdvertisement(Long id) {
+
+                Advertisement advertisement = advertisementRepository.findById(id)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
+
+                if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
+                        throw new ApiException(
+                                        "Advertisement has already been reviewed",
+                                        HttpStatus.BAD_REQUEST);
+                }
+
+                advertisement.setStatus(AdvertisementStatus.APPROVED);
+                advertisement.setRejectionReason(null);
+
+                advertisementRepository.save(advertisement);
+        }
+
+        public void rejectAdvertisement(
+                        Long id,
+                        RejectAdvertisementRequest request) {
+
+                Advertisement advertisement = advertisementRepository.findById(id)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
+
+                if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
+                        throw new ApiException(
+                                        "Advertisement has already been reviewed",
+                                        HttpStatus.BAD_REQUEST);
+                }
+
+                advertisement.setStatus(AdvertisementStatus.REJECTED);
+                advertisement.setRejectionReason(request.getReason());
+
+                // todo: user should be notified of the rejection or approval of their ad
+                // or at least see their ads' status
+
+                advertisementRepository.save(advertisement);
+        }
 }

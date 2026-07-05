@@ -7,13 +7,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.silkroad.market.dto.advertisement.AdvertisementDetailedResponse;
 import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.RejectAdvertisementRequest;
+import com.silkroad.market.entity.AdvertisementStatus;
 import com.silkroad.market.service.AdvertisementService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,7 +35,7 @@ public class AdminAdvertisementController {
     @GetMapping("/pending")
     @SecurityRequirement(name = "bearerAuth")
     public List<AdvertisementSummaryResponse> getPendingAdvertisements() {
-        return advertisementService.getPendingAdvertisements();
+        return advertisementService.getAdvertisementsByStatus(AdvertisementStatus.PENDING);
     }
 
     @GetMapping("/{id}")

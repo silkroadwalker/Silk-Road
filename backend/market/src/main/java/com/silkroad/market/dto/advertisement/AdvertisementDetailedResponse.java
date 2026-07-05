@@ -21,6 +21,7 @@ public class AdvertisementDetailedResponse {
     private String category;
 
     private AdvertisementStatus status;
+    private String rejectionReason;
 
     private LocalDateTime createdAt;
 
@@ -39,6 +40,7 @@ public class AdvertisementDetailedResponse {
             String sellerPhone,
             String category,
             AdvertisementStatus status,
+            String rejectionReason,
             LocalDateTime createdAt,
             List<String> imageUrls) {
 
@@ -51,6 +53,7 @@ public class AdvertisementDetailedResponse {
         this.sellerPhone = sellerPhone;
         this.category = category;
         this.status = status;
+        this.rejectionReason = rejectionReason;
         this.createdAt = createdAt;
         this.imageUrls = imageUrls;
     }
@@ -125,6 +128,14 @@ public class AdvertisementDetailedResponse {
 
     public void setStatus(AdvertisementStatus status) {
         this.status = status;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -12,8 +12,10 @@ public class AdvertisementSummaryResponse {
     private String sellerUsername;
     private String category;
     private AdvertisementStatus status;
+    private String thumbnailUrl;
 
-    public AdvertisementSummaryResponse() {
+    public AdvertisementSummaryResponse(Long id1, String title1, BigDecimal price1, String username, String name,
+            AdvertisementStatus status1) {
     }
 
     public AdvertisementSummaryResponse(
@@ -22,7 +24,8 @@ public class AdvertisementSummaryResponse {
             BigDecimal price,
             String sellerUsername,
             String category,
-            AdvertisementStatus status) {
+            AdvertisementStatus status,
+            String thumbnailUrl) {
 
         this.id = id;
         this.title = title;
@@ -30,6 +33,7 @@ public class AdvertisementSummaryResponse {
         this.sellerUsername = sellerUsername;
         this.category = category;
         this.status = status;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public Long getId() {
@@ -50,6 +54,10 @@ public class AdvertisementSummaryResponse {
 
     public String getCategory() {
         return category;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 
     public AdvertisementStatus getStatus() {
@@ -74,6 +82,10 @@ public class AdvertisementSummaryResponse {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public void setStatus(AdvertisementStatus status) {
