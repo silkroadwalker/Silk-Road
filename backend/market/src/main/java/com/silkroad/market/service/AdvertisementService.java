@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.silkroad.market.dto.advertisement.AdvertisementDetailedResponse;
 import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
+import com.silkroad.market.dto.advertisement.RejectAdvertisementRequest;
 import com.silkroad.market.entity.Advertisement;
 import com.silkroad.market.entity.AdvertisementImage;
 import com.silkroad.market.entity.AdvertisementStatus;
@@ -131,5 +132,48 @@ public class AdvertisementService {
                 ad.getStatus(),
                 ad.getCreatedAt(),
                 imageUrls);
+    }
+
+    public void approveAdvertisement(Long id) {
+
+        Advertisement advertisement = advertisementRepository.findById(id)
+                .orElseThrow(() -> new ApiException(
+                        "Advertisement not found",
+                        HttpStatus.NOT_FOUND));
+
+        if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
+            throw new ApiException(
+                    "Advertisement has already been reviewed",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        advertisement.setStatus(AdvertisementStatus.APPROVED);
+        advertisement.setRejectionReason(null);
+
+        advertisementRepository.save(advertisement);
+    }
+
+    public void rejectAdvertisement(
+            Long id,
+            RejectAdvertisementRequest request) {
+
+        Advertisement advertisement = advertisementRepository.findById(id)
+                .orElseThrow(() -> new ApiException(
+                        "Advertisement not found",
+                        HttpStatus.NOT_FOUND));
+
+        if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
+            throw new ApiException(
+                    "Advertisement has already been reviewed",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        advertisement.setStatus(AdvertisementStatus.REJECTED);
+        advertisement.setRejectionReason(request.getReason());
+
+        // todo: user should be notified of the rejection or approval of their ad
+        // or at least see their ads' status
+
+        advertisementRepository.save(advertisement);
     }
 }

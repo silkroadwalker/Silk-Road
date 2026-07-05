@@ -1,7 +1,6 @@
 package com.silkroad.market.controller;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,9 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.service.AdvertisementService;
