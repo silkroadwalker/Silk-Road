@@ -116,7 +116,7 @@ public class AdvertisementService {
 
         List<String> imageUrls = ad.getImages()
                 .stream()
-                .map(AdvertisementImage::getFileName)
+                .map(image -> "/api/ads/images/" + image.getId())
                 .toList();
 
         return new AdvertisementDetailedResponse(

@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,5 +67,18 @@ public class ImageStorageService {
         Path path = getUploadPath().resolve(fileName);
 
         Files.deleteIfExists(path);
+    }
+
+    public Resource loadImage(String fileName) throws IOException {
+
+        Path path = Paths.get(UPLOAD_DIRECTORY).resolve(fileName);
+
+        Resource resource = new UrlResource(path.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new IOException("Image not found.");
+        }
+
+        return resource;
     }
 }
