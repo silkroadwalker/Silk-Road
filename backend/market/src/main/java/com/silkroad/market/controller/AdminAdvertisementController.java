@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.silkroad.market.dto.advertisement.AdvertisementDetailedResponse;
 import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.service.AdvertisementService;
 
@@ -28,6 +30,14 @@ public class AdminAdvertisementController {
     @SecurityRequirement(name = "bearerAuth")
     public List<AdvertisementSummaryResponse> getPendingAdvertisements() {
         return advertisementService.getPendingAdvertisements();
+    }
+
+    @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    public AdvertisementDetailedResponse getAdvertisementDetails(
+            @PathVariable Long id) {
+
+        return advertisementService.getAdvertisementDetails(id);
     }
 
 }

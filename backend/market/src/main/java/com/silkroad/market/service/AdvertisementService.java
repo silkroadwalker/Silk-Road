@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.silkroad.market.dto.advertisement.AdvertisementDetailedResponse;
 import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.entity.Advertisement;
@@ -104,5 +105,31 @@ public class AdvertisementService {
                         ad.getCategory().getName(),
                         ad.getStatus()))
                 .toList();
+    }
+
+    public AdvertisementDetailedResponse getAdvertisementDetails(Long id) {
+
+        Advertisement ad = advertisementRepository.findById(id)
+                .orElseThrow(() -> new ApiException(
+                        "Advertisement not found",
+                        HttpStatus.NOT_FOUND));
+
+        List<String> imageUrls = ad.getImages()
+                .stream()
+                .map(AdvertisementImage::getFileName)
+                .toList();
+
+        return new AdvertisementDetailedResponse(
+                ad.getId(),
+                ad.getTitle(),
+                ad.getDescription(),
+                ad.getPrice(),
+                ad.getSeller().getUsername(),
+                ad.getSeller().getFullName(),
+                ad.getSeller().getPhone(),
+                ad.getCategory().getName(),
+                ad.getStatus(),
+                ad.getCreatedAt(),
+                imageUrls);
     }
 }
