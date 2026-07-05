@@ -38,6 +38,9 @@ public class Advertisement {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(length = 500)
+    private String rejectionReason;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AdvertisementStatus status;
@@ -82,6 +85,14 @@ public class Advertisement {
 
     public List<AdvertisementImage> getImages() {
         return images;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
     }
 
     public void setImages(List<AdvertisementImage> images) {
