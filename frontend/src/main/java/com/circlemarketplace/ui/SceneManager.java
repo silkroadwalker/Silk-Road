@@ -3,11 +3,13 @@ package com.circlemarketplace.ui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import com.circlemarketplace.model.Ad;
 
 import java.io.IOException;
 
 public class SceneManager {
     private static Stage primaryStage;
+    private static Ad selectedAd;
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
@@ -21,5 +23,13 @@ public class SceneManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setSelectedAd(Ad ad) {
+        selectedAd = ad;
+    }
+
+    public static Ad getSelectedAd() {
+        return selectedAd;
     }
 }

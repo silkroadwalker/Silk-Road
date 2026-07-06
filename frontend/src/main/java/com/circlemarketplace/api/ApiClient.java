@@ -1,13 +1,19 @@
 package com.circlemarketplace.api;
 
+import com.circlemarketplace.model.Ad;
+import com.circlemarketplace.ui.Session;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 
 public class ApiClient {
     private static final String BASE_URL = "http://localhost:8080";
@@ -27,8 +33,7 @@ public class ApiClient {
         body.addProperty("username", username);
         body.addProperty("password", password);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/api/auth/login"))
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/auth/login"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
@@ -45,8 +50,7 @@ public class ApiClient {
         body.addProperty("phone", phone);
         body.addProperty("email", email);
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/api/auth/signup"))
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/auth/signup"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
@@ -66,5 +70,37 @@ public class ApiClient {
 
         result.success = response.statusCode() >= 200 && response.statusCode() < 300;
         return result;
+    }
+
+    public static List<Ad> getAds() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads")) // not sure
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
+        } else {
+            throw new RuntimeException("Failed to load ads: " + response.statusCode());
+        }
+    }
+
+    public static List<Ad> searchAds(String query) throws Exception {
+        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/search?query=" + encodedQuery)) // not sure
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
+        } else {
+            throw new RuntimeException("Search failed: " + response.statusCode());
+        }
     }
 }
