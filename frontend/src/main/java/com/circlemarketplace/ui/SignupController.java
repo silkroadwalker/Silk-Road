@@ -36,7 +36,7 @@ public class SignupController {
                 Session.set(result.token, result.username, result.role);
                 errorLabel.setVisible(false);
                 System.out.println("Signed up and logged in as: " + result.username);
-                // TODO: navigate to home screen here
+                SceneManager.switchScene("/fxml/home-view.fxml"); // TODO
             } else {
                 showError(result.message != null ? result.message : "Signup failed.");
             }
@@ -49,5 +49,11 @@ public class SignupController {
     private void showError(String msg) {
         errorLabel.setText(msg);
         errorLabel.setVisible(true);
+    }
+
+    // for having an account
+    @FXML
+    private void goToLogin() {
+        SceneManager.switchScene("/fxml/login-view.fxml");
     }
 }
