@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0" >
+            fx:controller="com.circlemarketplace.ui.HomeController"
+            prefWidth="800" prefHeight="600">
 
-</AnchorPane>
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="Create Ad" onAction="#goToCreateAd"/>
+            <Button text="My Ads" onAction="#goToMyAds"/>
+            <Button text="Favorites" onAction="#goToFavorites"/>
+            <Button text="Messages" onAction="#goToMessages"/>
+            <Button fx:id="adminButton" text="Admin" onAction="#goToAdmin" visible="false" managed="false"/>
+            <Button text="Logout" onAction="#handleLogout"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            <HBox spacing="10">
+                <TextField fx:id="searchField" promptText="Search ads..." HBox.hgrow="ALWAYS"/>
+                <Button text="Search" onAction="#handleSearch"/>
+            </HBox>
+            <ListView fx:id="adListView" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+
+</BorderPane>
