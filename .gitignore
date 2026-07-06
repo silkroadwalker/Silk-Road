@@ -5,3 +5,4 @@ frontend/target/
 .idea/
 
 *.sqlite
+*.db
