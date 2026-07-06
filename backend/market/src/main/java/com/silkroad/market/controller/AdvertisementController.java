@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.silkroad.market.dto.advertisement.AdvertisementDetailedResponse;
+import com.silkroad.market.dto.advertisement.AdvertisementSearchRequest;
 import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.entity.AdvertisementStatus;
@@ -49,8 +50,10 @@ public class AdvertisementController {
     }
 
     @GetMapping
-    public List<AdvertisementSummaryResponse> getApprovedAdvertisements() {
-        return advertisementService.getAdvertisementsByStatus(AdvertisementStatus.APPROVED);
+    public List<AdvertisementSummaryResponse> searchAdvertisements(
+            @ModelAttribute AdvertisementSearchRequest request) {
+
+        return advertisementService.searchAdvertisements(request);
     }
 
     @GetMapping("/{id}")
