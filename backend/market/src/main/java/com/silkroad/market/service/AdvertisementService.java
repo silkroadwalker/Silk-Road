@@ -16,10 +16,12 @@ import com.silkroad.market.entity.Advertisement;
 import com.silkroad.market.entity.AdvertisementImage;
 import com.silkroad.market.entity.AdvertisementStatus;
 import com.silkroad.market.entity.Category;
+import com.silkroad.market.entity.City;
 import com.silkroad.market.entity.User;
 import com.silkroad.market.exception.ApiException;
 import com.silkroad.market.repository.AdvertisementRepository;
 import com.silkroad.market.repository.CategoryRepository;
+import com.silkroad.market.repository.CityRepository;
 import com.silkroad.market.repository.UserRepository;
 
 @Service
@@ -27,12 +29,14 @@ public class AdvertisementService {
 
         private final AdvertisementRepository advertisementRepository;
         private final CategoryRepository categoryRepository;
+        private final CityRepository cityRepository;
         private final UserRepository userRepository;
         private final ImageStorageService imageStorageService;
 
         public AdvertisementService(
                         AdvertisementRepository advertisementRepository,
                         CategoryRepository categoryRepository,
+                        CityRepository cityRepository,
                         UserRepository userRepository,
                         ImageStorageService imageStorageService) {
 
@@ -40,6 +44,7 @@ public class AdvertisementService {
                 this.categoryRepository = categoryRepository;
                 this.userRepository = userRepository;
                 this.imageStorageService = imageStorageService;
+                this.cityRepository = cityRepository;
         }
 
         // todo: Right now, if saving the third image fails:
@@ -63,6 +68,11 @@ public class AdvertisementService {
                 Category category = categoryRepository.findById(request.getCategoryId())
                                 .orElseThrow(() -> new ApiException("Category not found", HttpStatus.NOT_FOUND));
 
+                City city = cityRepository.findById(request.getCityId())
+                                .orElseThrow(() -> new ApiException(
+                                                "City not found",
+                                                HttpStatus.NOT_FOUND));
+
                 Advertisement advertisement = new Advertisement();
 
                 advertisement.setTitle(request.getTitle());
@@ -71,6 +81,7 @@ public class AdvertisementService {
 
                 advertisement.setSeller(seller);
                 advertisement.setCategory(category);
+                advertisement.setCity(city);
 
                 if (images != null) {
 
@@ -115,6 +126,7 @@ public class AdvertisementService {
                                 ad.getSeller().getFullName(),
                                 ad.getSeller().getPhone(),
                                 ad.getCategory().getName(),
+                                ad.getCity().getName(),
                                 ad.getStatus(),
                                 ad.getRejectionReason(),
                                 ad.getCreatedAt(),
@@ -150,6 +162,7 @@ public class AdvertisementService {
                                 ad.getSeller().getFullName(),
                                 ad.getSeller().getPhone(),
                                 ad.getCategory().getName(),
+                                ad.getCity().getName(),
                                 ad.getStatus(),
                                 ad.getRejectionReason(),
                                 ad.getCreatedAt(),
@@ -179,6 +192,7 @@ public class AdvertisementService {
                                 ad.getPrice(),
                                 ad.getSeller().getUsername(),
                                 ad.getCategory().getName(),
+                                ad.getCity().getName(),
                                 ad.getStatus(),
                                 thumbnailUrl);
         }

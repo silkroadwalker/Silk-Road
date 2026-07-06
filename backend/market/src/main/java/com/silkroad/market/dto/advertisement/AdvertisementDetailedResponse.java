@@ -19,6 +19,7 @@ public class AdvertisementDetailedResponse {
     private String sellerPhone;
 
     private String category;
+    private String city;
 
     private AdvertisementStatus status;
     private String rejectionReason;
@@ -39,6 +40,7 @@ public class AdvertisementDetailedResponse {
             String sellerFullName,
             String sellerPhone,
             String category,
+            String city,
             AdvertisementStatus status,
             String rejectionReason,
             LocalDateTime createdAt,
@@ -52,6 +54,7 @@ public class AdvertisementDetailedResponse {
         this.sellerFullName = sellerFullName;
         this.sellerPhone = sellerPhone;
         this.category = category;
+        this.city = city;
         this.status = status;
         this.rejectionReason = rejectionReason;
         this.createdAt = createdAt;
@@ -152,5 +155,13 @@ public class AdvertisementDetailedResponse {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

@@ -11,6 +11,7 @@ public class AdvertisementSummaryResponse {
     private BigDecimal price;
     private String sellerUsername;
     private String category;
+    private String city;
     private AdvertisementStatus status;
     private String thumbnailUrl;
 
@@ -24,6 +25,7 @@ public class AdvertisementSummaryResponse {
             BigDecimal price,
             String sellerUsername,
             String category,
+            String city,
             AdvertisementStatus status,
             String thumbnailUrl) {
 
@@ -32,6 +34,7 @@ public class AdvertisementSummaryResponse {
         this.price = price;
         this.sellerUsername = sellerUsername;
         this.category = category;
+        this.city = city;
         this.status = status;
         this.thumbnailUrl = thumbnailUrl;
     }
@@ -54,6 +57,10 @@ public class AdvertisementSummaryResponse {
 
     public String getCategory() {
         return category;
+    }
+
+    public String getCity() {
+        return city;
     }
 
     public String getThumbnailUrl() {
@@ -82,6 +89,10 @@ public class AdvertisementSummaryResponse {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public void setThumbnailUrl(String thumbnailUrl) {
