@@ -59,6 +59,10 @@ public class Advertisement {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "city_id", nullable = false)
+    private City city;
+
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdvertisementImage> images = new ArrayList<>();
 
@@ -153,5 +157,13 @@ public class Advertisement {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 }

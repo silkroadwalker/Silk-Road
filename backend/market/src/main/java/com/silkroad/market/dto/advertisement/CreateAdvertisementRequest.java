@@ -24,6 +24,9 @@ public class CreateAdvertisementRequest {
     @NotNull
     private Long categoryId;
 
+    @NotNull
+    private Long cityId;
+
     private List<MultipartFile> images;
 
     public String getTitle() {
@@ -64,5 +67,13 @@ public class CreateAdvertisementRequest {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
     }
 }
