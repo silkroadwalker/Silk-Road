@@ -4,7 +4,7 @@
 <?import javafx.geometry.Insets?>
 
 <VBox alignment="CENTER" spacing="12" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.circlemarketplace.ui.SignupController">
+      fx:controller="com.silkroad.ui.SignupController">
     <padding>
         <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>

@@ -1,4 +1,4 @@
-package com.circlemarketplace.model;
+package com.silkroad.model;
 
 import java.util.List;
 

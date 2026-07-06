@@ -8,12 +8,12 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.circlemarketplace.ui.LoginController">
+<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.silkroad.ui.LoginController">
     <padding>
         <Insets bottom="40" left="40" right="40" top="40" />
     </padding>
 
-    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="CircleMarket" />
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Silk Road" />
     <Label text="Login to your account" />
 
     <TextField fx:id="usernameField" maxWidth="250" promptText="Username" />

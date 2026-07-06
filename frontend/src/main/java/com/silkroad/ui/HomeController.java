@@ -1,7 +1,7 @@
-package com.circlemarketplace.ui;
+package com.silkroad.ui;
 
-import com.circlemarketplace.api.ApiClient;
-import com.circlemarketplace.model.Ad;
+import com.silkroad.api.ApiClient;
+import com.silkroad.model.Ad;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -33,16 +33,16 @@ public class HomeController {
             @Override
             protected void updateItem(Ad ad, boolean empty) {
                 super.updateItem(ad, empty);
-                setText(empty || ad == null ? null : ad.getTitle() + " - $" + ad.getPrice()); // ADJUST: match Ad getters
+                setText(empty || ad == null ? null : ad.getTitle() + " - $" + ad.getPrice());
             }
         });
 
-        // Open ad details on double-click
+        // ad detail on double click
         adListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Ad selected = adListView.getSelectionModel().getSelectedItem();
                 if (selected != null) {
-                    SceneManager.setSelectedAd(selected); // ADJUST: add this helper if you don't have one yet
+                    SceneManager.setSelectedAd(selected);
                     SceneManager.switchScene("/fxml/ad-details-view.fxml");
                 }
             }
@@ -58,7 +58,6 @@ public class HomeController {
             adListView.setItems(items);
         } catch (Exception e) {
             e.printStackTrace();
-            // Optionally show an error label here
         }
     }
 
@@ -66,7 +65,7 @@ public class HomeController {
     private void handleSearch() {
         String query = searchField.getText();
         try {
-            List<Ad> results = ApiClient.searchAds(query); // ADJUST: add this method if it doesn't exist yet
+            List<Ad> results = ApiClient.searchAds(query);
             adListView.setItems(FXCollections.observableArrayList(results));
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,7 +99,7 @@ public class HomeController {
 
     @FXML
     private void handleLogout() {
-        Session.clear(); // ADJUST: add this if you don't already have a way to clear the session
+        Session.clear();
         SceneManager.switchScene("/fxml/login-view.fxml");
     }
 }

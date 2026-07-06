@@ -51,7 +51,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>com.circlemarketplace.ui.MainApplication</mainClass>
+          <mainClass>com.silkroad.ui.MainApplication</mainClass>
         </configuration>
       </plugin>
 
