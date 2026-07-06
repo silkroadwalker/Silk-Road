@@ -36,6 +36,7 @@ public class Ad {
     public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
+    // city may not be added yet
     @Override
     public String toString() {
         return title + " - " + price + " (" + city + ")";
