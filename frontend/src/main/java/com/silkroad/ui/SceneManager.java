@@ -1,9 +1,9 @@
-package com.circlemarketplace.ui;
+package com.silkroad.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import com.circlemarketplace.model.Ad;
+import com.silkroad.model.Ad;
 
 import java.io.IOException;
 

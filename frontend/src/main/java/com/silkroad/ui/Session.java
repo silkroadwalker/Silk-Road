@@ -1,4 +1,4 @@
-package com.circlemarketplace.ui;
+package com.silkroad.ui;
 
 public class Session {
     private static String token;

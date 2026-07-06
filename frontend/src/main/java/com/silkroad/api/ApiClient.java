@@ -1,7 +1,7 @@
-package com.circlemarketplace.api;
+package com.silkroad.api;
 
-import com.circlemarketplace.model.Ad;
-import com.circlemarketplace.ui.Session;
+import com.silkroad.model.Ad;
+import com.silkroad.ui.Session;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
