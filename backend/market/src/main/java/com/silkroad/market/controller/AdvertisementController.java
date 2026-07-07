@@ -57,10 +57,15 @@ public class AdvertisementController {
     }
 
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public AdvertisementDetailedResponse getAdvertisement(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            Authentication authentication) {
 
-        return advertisementService.getAdvertisementDetails(id, AdvertisementStatus.APPROVED);
+        return advertisementService.getAdvertisementDetails(
+                id,
+                AdvertisementStatus.APPROVED,
+                authentication);
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -155,44 +156,54 @@ public class AdvertisementService {
                                 .toList();
         }
 
-        public AdvertisementDetailedResponse getAdvertisementDetails(Long id) {
+        // public AdvertisementDetailedResponse getAdvertisementDetails(Long id) {
 
-                Advertisement ad = advertisementRepository.findById(id)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+        // Advertisement ad = advertisementRepository.findById(id)
+        // .orElseThrow(() -> new ApiException(
+        // "Advertisement not found",
+        // HttpStatus.NOT_FOUND));
 
-                List<String> imageUrls = ad.getImages()
-                                .stream()
-                                .map(image -> "/api/ads/images/" + image.getId())
-                                .toList();
+        // List<String> imageUrls = ad.getImages()
+        // .stream()
+        // .map(image -> "/api/ads/images/" + image.getId())
+        // .toList();
 
-                return new AdvertisementDetailedResponse(
-                                ad.getId(),
-                                ad.getTitle(),
-                                ad.getDescription(),
-                                ad.getPrice(),
-                                ad.getSeller().getUsername(),
-                                ad.getSeller().getFullName(),
-                                ad.getSeller().getPhone(),
-                                ad.getCategory().getName(),
-                                ad.getCity().getName(),
-                                ad.getStatus(),
-                                ad.getRejectionReason(),
-                                ad.getCreatedAt(),
-                                imageUrls);
-        }
+        // return new AdvertisementDetailedResponse(
+        // ad.getId(),
+        // ad.getTitle(),
+        // ad.getDescription(),
+        // ad.getPrice(),
+        // ad.getSeller().getUsername(),
+        // ad.getSeller().getFullName(),
+        // ad.getSeller().getPhone(),
+        // ad.getCategory().getName(),
+        // ad.getCity().getName(),
+        // ad.getStatus(),
+        // ad.getRejectionReason(),
+        // ad.getCreatedAt(),
+        // imageUrls);
+        // }
 
         public AdvertisementDetailedResponse getAdvertisementDetails(
                         Long id,
-                        AdvertisementStatus requiredStatus) {
+                        AdvertisementStatus requiredStatus,
+                        Authentication authentication) {
 
                 Advertisement ad = advertisementRepository.findById(id)
                                 .orElseThrow(() -> new ApiException(
                                                 "Advertisement not found",
                                                 HttpStatus.NOT_FOUND));
 
-                if (ad.getStatus() != requiredStatus) {
+                boolean isSubmitter = false;
+
+                if (authentication != null) {
+
+                        isSubmitter = ad.getSeller()
+                                        .getUsername()
+                                        .equals(authentication.getName());
+                }
+
+                if (ad.getStatus() != requiredStatus && requiredStatus != null) {
                         throw new ApiException(
                                         "Advertisement not found",
                                         HttpStatus.NOT_FOUND);
@@ -203,7 +214,7 @@ public class AdvertisementService {
                                 .map(image -> "/api/ads/images/" + image.getId())
                                 .toList();
 
-                return new AdvertisementDetailedResponse(
+                AdvertisementDetailedResponse adDetailedResponse = new AdvertisementDetailedResponse(
                                 ad.getId(),
                                 ad.getTitle(),
                                 ad.getDescription(),
@@ -217,6 +228,8 @@ public class AdvertisementService {
                                 ad.getRejectionReason(),
                                 ad.getCreatedAt(),
                                 imageUrls);
+                adDetailedResponse.setSubmitter(isSubmitter);
+                return adDetailedResponse;
         }
 
         public List<AdvertisementSummaryResponse> getAdvertisementsByStatus(

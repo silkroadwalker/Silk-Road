@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,9 +42,9 @@ public class AdminAdvertisementController {
     @GetMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
     public AdvertisementDetailedResponse getAdvertisementDetails(
-            @PathVariable Long id) {
+            @PathVariable Long id, Authentication authentication) {
 
-        return advertisementService.getAdvertisementDetails(id);
+        return advertisementService.getAdvertisementDetails(id, null, authentication);
     }
 
     @PatchMapping("/{id}/approve")

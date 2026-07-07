@@ -26,6 +26,8 @@ public class AdvertisementDetailedResponse {
 
     private LocalDateTime createdAt;
 
+    private boolean isSubmitter;
+
     private List<String> imageUrls;
 
     public AdvertisementDetailedResponse() {
@@ -59,6 +61,14 @@ public class AdvertisementDetailedResponse {
         this.rejectionReason = rejectionReason;
         this.createdAt = createdAt;
         this.imageUrls = imageUrls;
+    }
+
+    public boolean isSubmitter() {
+        return isSubmitter;
+    }
+
+    public void setSubmitter(boolean isSubmitter) {
+        this.isSubmitter = isSubmitter;
     }
 
     public Long getId() {
