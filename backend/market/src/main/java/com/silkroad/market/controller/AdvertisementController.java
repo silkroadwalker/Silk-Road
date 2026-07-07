@@ -7,10 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +21,7 @@ import com.silkroad.market.dto.advertisement.AdvertisementDetailedResponse;
 import com.silkroad.market.dto.advertisement.AdvertisementSearchRequest;
 import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
+import com.silkroad.market.dto.advertisement.UpdateAdvertisementRequest;
 import com.silkroad.market.entity.AdvertisementStatus;
 import com.silkroad.market.service.AdvertisementService;
 
@@ -66,6 +70,41 @@ public class AdvertisementController {
                 id,
                 AdvertisementStatus.APPROVED,
                 authentication);
+    }
+
+    @PatchMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    public void updateAdvertisement(
+            @PathVariable Long id,
+            @RequestBody UpdateAdvertisementRequest request,
+            Authentication authentication) {
+
+        advertisementService.updateAdvertisement(
+                id,
+                request,
+                authentication.getName());
+    }
+
+    @PatchMapping("/{id}/markSold")
+    @SecurityRequirement(name = "bearerAuth")
+    public void updateAdvertisementStatusToSold(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        advertisementService.updateAdvertisementStatusToSold(
+                id,
+                authentication.getName());
+    }
+
+    @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    public void deleteAdvertisement(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        advertisementService.deleteAdvertisement(
+                id,
+                authentication.getName());
     }
 
 }

@@ -15,6 +15,7 @@ import com.silkroad.market.dto.advertisement.AdvertisementSearchRequest;
 import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.dto.advertisement.RejectAdvertisementRequest;
+import com.silkroad.market.dto.advertisement.UpdateAdvertisementRequest;
 import com.silkroad.market.entity.Advertisement;
 import com.silkroad.market.entity.AdvertisementImage;
 import com.silkroad.market.entity.AdvertisementStatus;
@@ -301,5 +302,91 @@ public class AdvertisementService {
                 // or at least see their ads' status
 
                 advertisementRepository.save(advertisement);
+        }
+
+        private Advertisement getOwnedAdvertisement(
+                        Long id,
+                        String username) {
+
+                Advertisement advertisement = advertisementRepository.findById(id)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
+
+                if (!advertisement.getSeller()
+                                .getUsername()
+                                .equals(username)) {
+
+                        throw new ApiException(
+                                        "Access denied",
+                                        HttpStatus.FORBIDDEN);
+                }
+
+                return advertisement;
+        }
+
+        @Transactional
+        public void updateAdvertisement(
+                        // todo: enable image edit
+                        Long id,
+                        UpdateAdvertisementRequest request,
+                        String username) {
+
+                Advertisement advertisement = getOwnedAdvertisement(id, username);
+
+                if (request.getTitle() != null)
+                        advertisement.setTitle(request.getTitle());
+
+                if (request.getDescription() != null)
+                        advertisement.setDescription(request.getDescription());
+
+                if (request.getPrice() != null)
+                        advertisement.setPrice(request.getPrice());
+
+                if (request.getCategoryId() != null) {
+
+                        Category category = categoryRepository.findById(
+                                        request.getCategoryId())
+                                        .orElseThrow(() -> new ApiException(
+                                                        "Category not found",
+                                                        HttpStatus.NOT_FOUND));
+
+                        advertisement.setCategory(category);
+                }
+
+                if (request.getCityId() != null) {
+
+                        City city = cityRepository.findById(
+                                        request.getCityId())
+                                        .orElseThrow(() -> new ApiException(
+                                                        "City not found",
+                                                        HttpStatus.NOT_FOUND));
+
+                        advertisement.setCity(city);
+                }
+
+                advertisementRepository.save(advertisement);
+        }
+
+        @Transactional
+        public void updateAdvertisementStatusToSold(
+                        Long id,
+                        String username) {
+
+                Advertisement advertisement = getOwnedAdvertisement(id, username);
+
+                advertisement.setStatus(AdvertisementStatus.SOLD);
+
+                advertisementRepository.save(advertisement);
+        }
+
+        @Transactional
+        public void deleteAdvertisement(
+                        Long id,
+                        String username) {
+
+                Advertisement advertisement = getOwnedAdvertisement(id, username);
+
+                advertisementRepository.delete(advertisement);
         }
 }
