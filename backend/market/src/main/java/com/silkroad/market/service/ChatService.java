@@ -3,6 +3,7 @@ package com.silkroad.market.service;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.silkroad.market.dto.chat.ChatResponse;
@@ -21,6 +22,7 @@ import com.silkroad.market.repository.ChatRepository;
 import com.silkroad.market.repository.MessageRepository;
 import com.silkroad.market.repository.UserRepository;
 
+@Service
 public class ChatService {
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
