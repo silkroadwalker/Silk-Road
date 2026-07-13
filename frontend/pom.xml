@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.circlemarketplace</groupId>
-  <artifactId>circle-market-frontend</artifactId>
+  <artifactId>silk-road-frontend</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>CircleMarket Frontend</name>
 
