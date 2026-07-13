@@ -5,6 +5,7 @@ import com.silkroad.ui.Session;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.silkroad.model.Category;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -14,6 +15,10 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 
 public class ApiClient {
     private static final String BASE_URL = "http://localhost:8080";
@@ -102,5 +107,58 @@ public class ApiClient {
         } else {
             throw new RuntimeException("Search failed: " + response.statusCode());
         }
+    }
+
+    public static List<Category> getCategories() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/categories"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), new TypeToken<List<Category>>() {}.getType());
+        } else {
+            throw new RuntimeException("Failed to load categories: " + response.statusCode());
+        }
+    }
+
+    public static void createAd(String title, String description, String priceText, Long categoryId, Long cityId) throws Exception {
+        String boundary = "SilkRoadBoundary" + System.currentTimeMillis();
+
+        Map<String, String> fields = new LinkedHashMap<>();
+        fields.put("title", title);
+        fields.put("description", description);
+        fields.put("price", priceText);
+        fields.put("categoryId", String.valueOf(categoryId));
+        fields.put("cityId", String.valueOf(cityId));
+        // TODO: i will add image file parts here once a file picker is added to the form
+
+        byte[] body = buildMultipartBody(boundary, fields);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/ads"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to create ad: " + response.statusCode() + " " + response.body());
+        }
+    }
+
+    private static byte[] buildMultipartBody(String boundary, Map<String, String> fields) throws java.io.IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        for (Map.Entry<String, String> entry : fields.entrySet()) {
+            out.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
+            out.write(("Content-Disposition: form-data; name=\"" + entry.getKey() + "\"\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+            out.write((entry.getValue() + "\r\n").getBytes(StandardCharsets.UTF_8));
+        }
+        out.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+        return out.toByteArray();
     }
 }
