@@ -151,6 +151,21 @@ public class ApiClient {
         }
     }
 
+    public static List<Ad> getMyAds() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/my"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
+        } else {
+            throw new RuntimeException("Failed to load your ads: " + response.statusCode());
+        }
+    }
+
     private static byte[] buildMultipartBody(String boundary, Map<String, String> fields) throws java.io.IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         for (Map.Entry<String, String> entry : fields.entrySet()) {
