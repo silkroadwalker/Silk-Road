@@ -10,7 +10,7 @@ public class Ad {
     private String city;
     private String category;
     private String status; // PENDING, ACTIVE, REJECTED, SOLD, DELETED
-    private String ownerUsername;
+    private String sellerUsername;
     private List<String> imageUrls;
     private String createdAt;
 
@@ -21,7 +21,7 @@ public class Ad {
     public String getCity() { return city; }
     public String getCategory() { return category; }
     public String getStatus() { return status; }
-    public String getOwnerUsername() { return ownerUsername; }
+    public String getSellerUsername() { return sellerUsername; }
     public List<String> getImageUrls() { return imageUrls; }
     public String getCreatedAt() { return createdAt; }
 
@@ -32,7 +32,7 @@ public class Ad {
     public void setCity(String city) { this.city = city; }
     public void setCategory(String category) { this.category = category; }
     public void setStatus(String status) { this.status = status; }
-    public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
+    public void setSellerUsername(String sellerUsername) { this.sellerUsername = sellerUsername; }
     public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
