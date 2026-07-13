@@ -13,6 +13,7 @@ public class Ad {
     private String sellerUsername;
     private List<String> imageUrls;
     private String createdAt;
+    private String thumbnailUrl;
 
     public Long getId() { return id; }
     public String getTitle() { return title; }
@@ -24,6 +25,7 @@ public class Ad {
     public String getSellerUsername() { return sellerUsername; }
     public List<String> getImageUrls() { return imageUrls; }
     public String getCreatedAt() { return createdAt; }
+    public String getThumbnailUrl() { return thumbnailUrl; }
 
     public void setId(Long id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
@@ -35,6 +37,7 @@ public class Ad {
     public void setSellerUsername(String sellerUsername) { this.sellerUsername = sellerUsername; }
     public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    public void setThumbnailUrl(String thumbnailUrl) { this.thumbnailUrl = thumbnailUrl; }
 
     // city may not be added yet
     @Override
