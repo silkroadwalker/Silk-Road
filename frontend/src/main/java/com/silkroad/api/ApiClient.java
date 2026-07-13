@@ -90,7 +90,7 @@ public class ApiClient {
     public static List<Ad> searchAds(String query) throws Exception {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
 
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/search?query=" + encodedQuery)) // not sure
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads?keyword=" + encodedQuery))
                 .header("Authorization", "Bearer " + Session.getToken())
                 .GET()
                 .build();
