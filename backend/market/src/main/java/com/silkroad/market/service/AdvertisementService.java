@@ -16,16 +16,19 @@ import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.dto.advertisement.RejectAdvertisementRequest;
 import com.silkroad.market.dto.advertisement.UpdateAdvertisementRequest;
+import com.silkroad.market.dto.rating.CreateRatingRequest;
 import com.silkroad.market.entity.Advertisement;
 import com.silkroad.market.entity.AdvertisementImage;
 import com.silkroad.market.entity.AdvertisementStatus;
 import com.silkroad.market.entity.Category;
 import com.silkroad.market.entity.City;
+import com.silkroad.market.entity.Rating;
 import com.silkroad.market.entity.User;
 import com.silkroad.market.exception.ApiException;
 import com.silkroad.market.repository.AdvertisementRepository;
 import com.silkroad.market.repository.CategoryRepository;
 import com.silkroad.market.repository.CityRepository;
+import com.silkroad.market.repository.RatingRepository;
 import com.silkroad.market.repository.UserRepository;
 import com.silkroad.market.specification.AdvertisementSpecifications;
 
@@ -37,19 +40,22 @@ public class AdvertisementService {
         private final CityRepository cityRepository;
         private final UserRepository userRepository;
         private final ImageStorageService imageStorageService;
+        private final RatingRepository ratingRepository;
 
         public AdvertisementService(
                         AdvertisementRepository advertisementRepository,
                         CategoryRepository categoryRepository,
                         CityRepository cityRepository,
                         UserRepository userRepository,
-                        ImageStorageService imageStorageService) {
+                        ImageStorageService imageStorageService,
+                        RatingRepository ratingRepository) {
 
                 this.advertisementRepository = advertisementRepository;
                 this.categoryRepository = categoryRepository;
                 this.userRepository = userRepository;
                 this.imageStorageService = imageStorageService;
                 this.cityRepository = cityRepository;
+                this.ratingRepository = ratingRepository;
         }
 
         // todo: Right now, if saving the third image fails:
@@ -215,6 +221,12 @@ public class AdvertisementService {
                                 .map(image -> "/api/ads/images/" + image.getId())
                                 .toList();
 
+                Double averageRating = ratingRepository.averageScoreBySeller(ad.getSeller());
+
+                if (averageRating == null) {
+                        averageRating = 0.0;
+                }
+
                 AdvertisementDetailedResponse adDetailedResponse = new AdvertisementDetailedResponse(
                                 ad.getId(),
                                 ad.getTitle(),
@@ -230,6 +242,8 @@ public class AdvertisementService {
                                 ad.getCreatedAt(),
                                 imageUrls);
                 adDetailedResponse.setSubmitter(isSubmitter);
+                adDetailedResponse.setAverageRating(averageRating);
+
                 return adDetailedResponse;
         }
 
@@ -388,5 +402,53 @@ public class AdvertisementService {
                 Advertisement advertisement = getOwnedAdvertisement(id, username);
 
                 advertisementRepository.delete(advertisement);
+        }
+
+        @Transactional
+        public void rateAdvertisement(
+                        Long advertisementId,
+                        CreateRatingRequest request,
+                        String username) {
+
+                Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
+
+                User buyer = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException(
+                                                "User not found",
+                                                HttpStatus.NOT_FOUND));
+
+                User seller = advertisement.getSeller();
+
+                if (seller.getId().equals(buyer.getId())) {
+                        throw new ApiException(
+                                        "You cannot rate yourself",
+                                        HttpStatus.BAD_REQUEST);
+                }
+
+                // optional: u might want Only sold advertisements can be rated
+                // if (advertisement.getStatus() != AdvertisementStatus.SOLD) {
+                // throw new ApiException(
+                // "Only sold advertisements can be rated",
+                // HttpStatus.BAD_REQUEST);
+                // }
+
+                if (ratingRepository.existsByAdvertisementAndBuyer(advertisement, buyer)) {
+                        throw new ApiException(
+                                        "You have already rated this advertisement",
+                                        HttpStatus.BAD_REQUEST);
+                }
+
+                Rating rating = new Rating();
+
+                rating.setAdvertisement(advertisement);
+                rating.setBuyer(buyer);
+                rating.setSeller(seller);
+                rating.setScore(request.getScore());
+                rating.setComment(request.getComment());
+
+                ratingRepository.save(rating);
         }
 }

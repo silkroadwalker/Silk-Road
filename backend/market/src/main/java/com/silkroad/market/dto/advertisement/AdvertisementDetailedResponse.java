@@ -30,6 +30,8 @@ public class AdvertisementDetailedResponse {
 
     private List<String> imageUrls;
 
+    private Double averageRating;
+
     public AdvertisementDetailedResponse() {
     }
 
@@ -173,5 +175,13 @@ public class AdvertisementDetailedResponse {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
     }
 }
