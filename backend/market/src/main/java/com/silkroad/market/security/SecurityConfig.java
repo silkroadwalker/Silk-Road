@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ads/images/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/ads/**").permitAll()
+                        .requestMatchers("/api/cities/**").permitAll()
                         .anyRequest().authenticated())
 
                 .addFilterBefore(
