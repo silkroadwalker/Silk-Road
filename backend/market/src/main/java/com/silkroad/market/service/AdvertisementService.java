@@ -451,4 +451,65 @@ public class AdvertisementService {
 
                 ratingRepository.save(rating);
         }
+
+        @Transactional
+        public void addFavorite(Long advertisementId, String username) {
+
+                User user = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException(
+                                                "User not found",
+                                                HttpStatus.NOT_FOUND));
+
+                Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
+
+                if (advertisement.getStatus() != AdvertisementStatus.APPROVED) {
+                        throw new ApiException(
+                                        "Advertisement not found",
+                                        HttpStatus.NOT_FOUND);
+                }
+
+                if (user.getFavoriteAdvertisements().contains(advertisement)) {
+                        throw new ApiException(
+                                        "Advertisement is already in favorites",
+                                        HttpStatus.BAD_REQUEST);
+                }
+
+                user.getFavoriteAdvertisements().add(advertisement);
+
+                userRepository.save(user);
+        }
+
+        @Transactional
+        public void removeFavorite(Long advertisementId, String username) {
+
+                User user = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException(
+                                                "User not found",
+                                                HttpStatus.NOT_FOUND));
+
+                Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                                .orElseThrow(() -> new ApiException(
+                                                "Advertisement not found",
+                                                HttpStatus.NOT_FOUND));
+
+                user.getFavoriteAdvertisements().remove(advertisement);
+
+                userRepository.save(user);
+        }
+
+        public List<AdvertisementSummaryResponse> getFavorites(String username) {
+
+                User user = userRepository.findByUsername(username)
+                                .orElseThrow(() -> new ApiException(
+                                                "User not found",
+                                                HttpStatus.NOT_FOUND));
+
+                return user.getFavoriteAdvertisements()
+                                .stream()
+                                .map(this::toSummaryResponse)
+                                .toList();
+        }
 }
