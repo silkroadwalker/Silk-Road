@@ -1,5 +1,8 @@
 package com.silkroad.market.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,6 +10,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -39,6 +45,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
+
+    @ManyToMany
+    @JoinTable(name = "favorites", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "advertisement_id"))
+    private Set<Advertisement> favoriteAdvertisements = new HashSet<>();
 
     public User() {
     }
@@ -101,5 +111,13 @@ public class User {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public Set<Advertisement> getFavoriteAdvertisements() {
+        return favoriteAdvertisements;
+    }
+
+    public void setFavoriteAdvertisements(Set<Advertisement> favoriteAdvertisements) {
+        this.favoriteAdvertisements = favoriteAdvertisements;
     }
 }
