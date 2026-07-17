@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.silkroad.ui.ConversationsController" prefWidth="800" prefHeight="600">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Button text="Back" onAction="#goBack"/>
+            <Label text="Messages" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+    <center>
+        <ListView fx:id="conversationsListView" BorderPane.alignment="CENTER"/>
+    </center>
+    <bottom>
+        <Label fx:id="statusLabel" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets top="5" right="10" bottom="10" left="10"/>
+            </BorderPane.margin>
+        </Label>
+    </bottom>
+</BorderPane>

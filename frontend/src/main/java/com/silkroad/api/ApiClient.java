@@ -1,6 +1,8 @@
 package com.silkroad.api;
 
 import com.silkroad.model.Ad;
+import com.silkroad.model.ChatDetail;
+import com.silkroad.model.ChatSummary;
 import com.silkroad.ui.Session;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -175,6 +177,71 @@ public class ApiClient {
         }
         out.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
         return out.toByteArray();
+    }
+
+public static List<ChatSummary> getChats() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/chat"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), new TypeToken<List<ChatSummary>>() {}.getType());
+        } else {
+            throw new RuntimeException("Failed to load conversations: " + response.statusCode());
+        }
+    }
+
+    public static ChatDetail getChat(Long chatId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/chat/" + chatId))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), ChatDetail.class);
+        } else {
+            throw new RuntimeException("Failed to load conversation: " + response.statusCode());
+        }
+    }
+
+    public static void sendMessage(Long advertisementId, String message) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("advertisementId", advertisementId);
+        body.addProperty("message", message);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/chat"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to send message: " + response.statusCode());
+        }
+    }
+
+    public static void replyToChat(Long chatId, String message) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("message", message);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/chat/" + chatId))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to send reply: " + response.statusCode());
+        }
     }
 
     public static List<Ad> getFavorites() throws Exception {
