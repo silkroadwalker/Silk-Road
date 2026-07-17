@@ -176,4 +176,49 @@ public class ApiClient {
         out.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
         return out.toByteArray();
     }
+
+    public static List<Ad> getPendingAds() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/ads/pending"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
+        } else {
+            throw new RuntimeException("Failed to load pending ads: " + response.statusCode());
+        }
+    }
+
+    public static void approveAd(Long advertisementId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/ads/" + advertisementId + "/approve"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to approve ad: " + response.statusCode());
+        }
+    }
+
+    public static void rejectAd(Long advertisementId, String reason) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("reason", reason);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/ads/" + advertisementId + "/reject"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to reject ad: " + response.statusCode());
+        }
+    }
 }
