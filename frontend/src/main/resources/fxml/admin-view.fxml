@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.silkroad.ui.AdminController" prefWidth="800" prefHeight="600">
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Button text="Back" onAction="#goBack"/>
+            <Label text="Pending Ads" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
+    <center>
+        <ListView fx:id="pendingListView" BorderPane.alignment="CENTER"/>
+    </center>
+    <bottom>
+        <VBox spacing="8">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="Rejection reason (required to reject):"/>
+            <TextArea fx:id="reasonField" prefRowCount="2" wrapText="true"/>
+            <HBox spacing="10">
+                <Button text="Approve" onAction="#handleApprove"/>
+                <Button text="Reject" onAction="#handleReject"/>
+            </HBox>
+            <Label fx:id="statusLabel"/>
+        </VBox>
+    </bottom>
+</BorderPane>
