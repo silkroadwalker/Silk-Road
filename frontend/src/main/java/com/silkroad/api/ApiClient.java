@@ -179,7 +179,7 @@ public class ApiClient {
         return out.toByteArray();
     }
 
-    public static List<ChatSummary> getChats() throws Exception {
+public static List<ChatSummary> getChats() throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/chat"))
                 .header("Authorization", "Bearer " + Session.getToken())
                 .GET()
@@ -241,6 +241,47 @@ public class ApiClient {
 
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
             throw new RuntimeException("Failed to send reply: " + response.statusCode());
+        }
+    }
+
+    public static List<Ad> getFavorites() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/favorites"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
+        } else {
+            throw new RuntimeException("Failed to load favorites: " + response.statusCode());
+        }
+    }
+
+    public static void addFavorite(Long advertisementId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/favorites/" + advertisementId))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to add favorite: " + response.statusCode());
+        }
+    }
+
+    public static void removeFavorite(Long advertisementId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/favorites/" + advertisementId))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to remove favorite: " + response.statusCode());
         }
     }
 }
