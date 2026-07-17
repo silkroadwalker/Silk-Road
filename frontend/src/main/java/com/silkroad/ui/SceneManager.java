@@ -10,6 +10,8 @@ import java.io.IOException;
 public class SceneManager {
     private static Stage primaryStage;
     private static Ad selectedAd;
+    private static Long selectedChatId;
+
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
@@ -31,5 +33,13 @@ public class SceneManager {
 
     public static Ad getSelectedAd() {
         return selectedAd;
+    }
+
+    public static void setSelectedChatId(Long chatId) {
+        selectedChatId = chatId;
+    }
+
+    public static Long getSelectedChatId() {
+        return selectedChatId;
     }
 }
