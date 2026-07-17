@@ -19,12 +19,18 @@ public class AdvertisementDetailedResponse {
     private String sellerPhone;
 
     private String category;
+    private String city;
 
     private AdvertisementStatus status;
+    private String rejectionReason;
 
     private LocalDateTime createdAt;
 
+    private boolean isSubmitter;
+
     private List<String> imageUrls;
+
+    private Double averageRating;
 
     public AdvertisementDetailedResponse() {
     }
@@ -38,7 +44,9 @@ public class AdvertisementDetailedResponse {
             String sellerFullName,
             String sellerPhone,
             String category,
+            String city,
             AdvertisementStatus status,
+            String rejectionReason,
             LocalDateTime createdAt,
             List<String> imageUrls) {
 
@@ -50,9 +58,19 @@ public class AdvertisementDetailedResponse {
         this.sellerFullName = sellerFullName;
         this.sellerPhone = sellerPhone;
         this.category = category;
+        this.city = city;
         this.status = status;
+        this.rejectionReason = rejectionReason;
         this.createdAt = createdAt;
         this.imageUrls = imageUrls;
+    }
+
+    public boolean isSubmitter() {
+        return isSubmitter;
+    }
+
+    public void setSubmitter(boolean isSubmitter) {
+        this.isSubmitter = isSubmitter;
     }
 
     public Long getId() {
@@ -127,6 +145,14 @@ public class AdvertisementDetailedResponse {
         this.status = status;
     }
 
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -141,5 +167,21 @@ public class AdvertisementDetailedResponse {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
     }
 }
