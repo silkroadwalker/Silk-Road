@@ -7,31 +7,47 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.silkroad.ui.HomeController"
-            prefWidth="800" prefHeight="600">
+            prefWidth="900" prefHeight="650">
 
     <top>
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-            <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-            <Pane HBox.hgrow="ALWAYS"/>
-            <Button text="Create Ad" onAction="#goToCreateAd"/>
-            <Button text="My Ads" onAction="#goToMyAds"/>
-            <Button text="Favorites" onAction="#goToFavorites"/>
-            <Button text="Messages" onAction="#goToMessages"/>
-            <Button fx:id="adminButton" text="Admin" onAction="#goToAdmin" visible="false" managed="false"/>
-            <Button text="Logout" onAction="#handleLogout"/>
-        </HBox>
+        <VBox>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <padding><Insets top="10" right="10" bottom="5" left="10"/></padding>
+                <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Pane HBox.hgrow="ALWAYS"/>
+                <Button text="Create Ad" onAction="#goToCreateAd"/>
+                <Button text="My Ads" onAction="#goToMyAds"/>
+                <Button text="Favorites" onAction="#goToFavorites"/>
+                <Button text="Messages" onAction="#goToMessages"/>
+                <Button fx:id="adminButton" text="Admin" onAction="#goToAdmin" visible="false" managed="false"/>
+                <Button text="Logout" onAction="#handleLogout"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <padding><Insets top="5" right="10" bottom="10" left="10"/></padding>
+                <TextField fx:id="searchField" promptText="Search ads..." HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="categoryFilterBox" promptText="Category" prefWidth="140"/>
+                <ComboBox fx:id="cityFilterBox" promptText="City" prefWidth="140"/>
+                <TextField fx:id="minPriceField" promptText="Min price" prefWidth="90"/>
+                <TextField fx:id="maxPriceField" promptText="Max price" prefWidth="90"/>
+                <ComboBox fx:id="sortBox" promptText="Sort by" prefWidth="150"/>
+                <Button text="Search" onAction="#handleSearch"/>
+                <Button text="Clear" onAction="#handleClearFilters"/>
+            </HBox>
+        </VBox>
     </top>
 
     <center>
         <VBox spacing="10">
             <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-            <HBox spacing="10">
-                <TextField fx:id="searchField" promptText="Search ads..." HBox.hgrow="ALWAYS"/>
-                <Button text="Search" onAction="#handleSearch"/>
-            </HBox>
             <ListView fx:id="adListView" VBox.vgrow="ALWAYS"/>
         </VBox>
     </center>
+
+    <bottom>
+        <Label fx:id="statusLabel">
+            <padding><Insets top="0" right="10" bottom="10" left="10"/></padding>
+        </Label>
+    </bottom>
 
 </BorderPane>
