@@ -9,7 +9,7 @@
         <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>
 
-    <Label text="Create Account" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+    <Label text="Create Account" styleClass="page-title"/>
 
     <TextField fx:id="fullNameField" promptText="Full Name" maxWidth="280"/>
     <TextField fx:id="usernameField" promptText="Username" maxWidth="280"/>
@@ -17,7 +17,7 @@
     <TextField fx:id="phoneField" promptText="Phone" maxWidth="280"/>
     <PasswordField fx:id="passwordField" promptText="Password" maxWidth="280"/>
 
-    <Label fx:id="errorLabel" style="-fx-text-fill: red;" visible="false" wrapText="true" maxWidth="280"/>
+    <Label fx:id="errorLabel" styleClass="status-label" visible="false" wrapText="true" maxWidth="280"/>
 
     <Button fx:id="signupButton" text="Sign Up" onAction="#handleSignup" maxWidth="280"/>
 </VBox>

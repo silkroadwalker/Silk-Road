@@ -26,7 +26,7 @@
       <Button layoutX="74.0" layoutY="344.0" mnemonicParsing="false" onAction="#handleChooseImages" text="Choose Images..." />
       <ListView fx:id="imagesListView" layoutX="74.0" layoutY="378.0" prefHeight="80.0" prefWidth="455.0" />
 
-      <Label fx:id="statusLabel" layoutX="74.0" layoutY="466.0" prefWidth="455.0" style="-fx-text-fill: red;" wrapText="true" />
+      <Label fx:id="statusLabel" layoutX="74.0" layoutY="466.0" prefWidth="455.0" styleClass="status-label" wrapText="true" />
 
       <Button fx:id="submitButton" layoutX="209.0" layoutY="500.0" mnemonicParsing="false" onAction="#handleSubmit" prefHeight="27.0" prefWidth="182.0" text="Submit" />
    </children>

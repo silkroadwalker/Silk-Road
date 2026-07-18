@@ -1,0 +1,141 @@
+/* ===== Root & backgrounds ===== */
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #e0e0e0;
+}
+
+.border-pane, .anchor-pane, .v-box, .h-box {
+    -fx-background-color: #1e1e2e;
+}
+
+/* ===== Labels ===== */
+.label {
+    -fx-text-fill: #e0e0e0;
+}
+
+.page-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+/* ===== Buttons ===== */
+.button {
+    -fx-background-color: #2c2c3e;
+    -fx-text-fill: #e0e0e0;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 14px;
+    -fx-border-color: #3a3a4d;
+    -fx-border-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #3a3a5a;
+}
+
+.button:pressed {
+    -fx-background-color: #4a4a70;
+}
+
+/* ===== Text fields / text areas ===== */
+.text-field, .text-area, .password-field {
+    -fx-background-color: #2a2a3d;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #888899;
+    -fx-background-radius: 4px;
+    -fx-border-color: #3a3a4d;
+    -fx-border-radius: 4px;
+}
+
+.text-field:focused, .text-area:focused, .password-field:focused {
+    -fx-border-color: #7a7aff;
+}
+
+/* ===== ComboBox ===== */
+.combo-box {
+    -fx-background-color: #2a2a3d;
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #3a3a4d;
+    -fx-background-radius: 4px;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #2a2a3d;
+    -fx-text-fill: #e0e0e0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #2a2a3d;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #3a3a5a;
+}
+
+/* ===== ListView ===== */
+.list-view {
+    -fx-background-color: #1e1e2e;
+    -fx-border-color: #3a3a4d;
+}
+
+.list-cell {
+    -fx-background-color: #24243a;
+    -fx-text-fill: #e0e0e0;
+    -fx-padding: 8px;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #33334d;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #4a4a80;
+    -fx-text-fill: #ffffff;
+}
+
+/* ===== TabPane (admin panel) ===== */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #1e1e2e;
+}
+
+.tab {
+    -fx-background-color: #2a2a3d;
+}
+
+.tab:selected {
+    -fx-background-color: #3a3a5a;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #e0e0e0;
+}
+
+.tab-pane .tab-content-area {
+    -fx-background-color: #1e1e2e;
+}
+
+/* ===== Status / error labels ===== */
+.status-label {
+    -fx-text-fill: #ff8080;
+}
+
+.price-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7fd67f; /* dark-mode-friendly green */
+}
+
+.muted-label {
+    -fx-text-fill: #9a9aae;
+}
+
+.bold-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #e0e0e0;
+}
+
+.error-label {
+    -fx-text-fill: #ff6b6b;
+}

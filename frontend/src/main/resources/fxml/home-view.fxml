@@ -13,7 +13,7 @@
         <VBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <padding><Insets top="10" right="10" bottom="5" left="10"/></padding>
-                <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label fx:id="welcomeLabel" text="Welcome!" styleClass="page-title"/>
                 <Pane HBox.hgrow="ALWAYS"/>
                 <Button text="Create Ad" onAction="#goToCreateAd"/>
                 <Button text="My Ads" onAction="#goToMyAds"/>

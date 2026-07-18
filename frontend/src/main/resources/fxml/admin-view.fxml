@@ -11,7 +11,7 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
             <Button text="Back" onAction="#goBack"/>
-            <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Admin Panel" styleClass="page-title"/>
         </HBox>
     </top>
     <center>

@@ -21,6 +21,7 @@ public class SceneManager {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Scene scene = new Scene(fxmlLoader.load());
+            scene.getStylesheets().add(SceneManager.class.getResource("/css/app.css").toExternalForm());
             primaryStage.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
