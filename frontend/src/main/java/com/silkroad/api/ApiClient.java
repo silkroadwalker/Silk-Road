@@ -6,17 +6,20 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.List;
 import java.io.ByteArrayOutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.nio.file.Path;
 
 
 public class ApiClient {
@@ -76,25 +79,33 @@ public class ApiClient {
         return result;
     }
 
-    public static List<Ad> getAds() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads")) // not sure
-                .header("Authorization", "Bearer " + Session.getToken())
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
-        } else {
-            throw new RuntimeException("Failed to load ads: " + response.statusCode());
-        }
+    public static List<Ad> searchAds(String keyword) throws Exception {
+        AdFilter filter = new AdFilter();
+        filter.keyword = keyword;
+        return searchAds(filter);
     }
 
-    public static List<Ad> searchAds(String query) throws Exception {
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+    public static List<Ad> searchAds(AdFilter filter) throws Exception {
+        StringBuilder query = new StringBuilder("/api/ads?");
 
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads?keyword=" + encodedQuery))
+        if (filter.keyword != null && !filter.keyword.isBlank()) {
+            query.append("keyword=").append(URLEncoder.encode(filter.keyword, StandardCharsets.UTF_8)).append("&");
+        }
+        if (filter.categoryId != null) {
+            query.append("categoryId=").append(filter.categoryId).append("&");
+        }
+        if (filter.cityId != null) {
+            query.append("cityId=").append(filter.cityId).append("&");
+        }
+        if (filter.minPrice != null && !filter.minPrice.isBlank()) {
+            query.append("minPrice=").append(URLEncoder.encode(filter.minPrice, StandardCharsets.UTF_8)).append("&");
+        }
+        if (filter.maxPrice != null && !filter.maxPrice.isBlank()) {
+            query.append("maxPrice=").append(URLEncoder.encode(filter.maxPrice, StandardCharsets.UTF_8)).append("&");
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + query))
                 .header("Authorization", "Bearer " + Session.getToken())
                 .GET()
                 .build();
@@ -108,9 +119,14 @@ public class ApiClient {
         }
     }
 
+    public static List<Ad> getAds() throws Exception {
+        return searchAds(new AdFilter());
+    }
+
     public static List<Category> getCategories() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/api/categories"))
+                .header("Authorization", "Bearer " + Session.getToken())
                 .GET()
                 .build();
 
@@ -123,18 +139,59 @@ public class ApiClient {
         }
     }
 
-    public static void createAd(String title, String description, String priceText, Long categoryId, Long cityId) throws Exception {
+    public static void createCategory(String name) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("name", name);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/categories"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
+
+    public static void updateCategory(Long id, String name) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("name", name);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/categories/" + id))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .header("Content-Type", "application/json")
+                .method("PUT", HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
+
+    public static void deleteCategory(Long id) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/categories/" + id))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .DELETE()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
+
+    public static void createAd(String title, String description, String price, Long categoryId, Long cityId,
+                                List<Path> imageFiles) throws Exception {
         String boundary = "SilkRoadBoundary" + System.currentTimeMillis();
 
         Map<String, String> fields = new LinkedHashMap<>();
         fields.put("title", title);
         fields.put("description", description);
-        fields.put("price", priceText);
+        fields.put("price", price);
         fields.put("categoryId", String.valueOf(categoryId));
         fields.put("cityId", String.valueOf(cityId));
-        // TODO: i will add image file parts here once a file picker is added to the form
 
-        byte[] body = buildMultipartBody(boundary, fields);
+        byte[] body = buildMultipartBody(boundary, fields, "images", imageFiles);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/api/ads"))
@@ -144,9 +201,8 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to create ad: " + response.statusCode() + " " + response.body());
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
         }
     }
 
@@ -165,13 +221,31 @@ public class ApiClient {
         }
     }
 
-    private static byte[] buildMultipartBody(String boundary, Map<String, String> fields) throws java.io.IOException {
+    private static byte[] buildMultipartBody(String boundary, Map<String, String> fields,
+                                             String fileFieldName, List<Path> files) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+
         for (Map.Entry<String, String> entry : fields.entrySet()) {
             out.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
             out.write(("Content-Disposition: form-data; name=\"" + entry.getKey() + "\"\r\n\r\n").getBytes(StandardCharsets.UTF_8));
             out.write((entry.getValue() + "\r\n").getBytes(StandardCharsets.UTF_8));
         }
+
+        if (files != null) {
+            for (Path file : files) {
+                String fileName = file.getFileName().toString();
+                String contentType = Files.probeContentType(file);
+                if (contentType == null) contentType = "application/octet-stream";
+
+                out.write(("--" + boundary + "\r\n").getBytes(StandardCharsets.UTF_8));
+                out.write(("Content-Disposition: form-data; name=\"" + fileFieldName + "\"; filename=\"" + fileName + "\"\r\n")
+                        .getBytes(StandardCharsets.UTF_8));
+                out.write(("Content-Type: " + contentType + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+                out.write(Files.readAllBytes(file));
+                out.write("\r\n".getBytes(StandardCharsets.UTF_8));
+            }
+        }
+
         out.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
         return out.toByteArray();
     }
@@ -341,9 +415,8 @@ public static List<ChatSummary> getChats() throws Exception {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to rate seller: " + response.statusCode());
+            throw new RuntimeException("Failed to rate seller (" + response.statusCode() + "): " + response.body());
         }
-        // no body to parse — the backend returns 201 with nothing in it
     }
 
     public static AdDetail getAdDetails(Long adId) throws Exception {
@@ -387,6 +460,7 @@ public static List<ChatSummary> getChats() throws Exception {
         if (cityId != null) body.addProperty("cityId", cityId);
 
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/" + adId))
+                .header("Authorization", "Bearer " + Session.getToken())
                 .header("Content-Type", "application/json")
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
@@ -409,4 +483,75 @@ public static List<ChatSummary> getChats() throws Exception {
         return gson.fromJson(response.body(), new TypeToken<List<City>>() {}.getType());
     }
 
+    public static class AdFilter {
+        public String keyword;
+        public Long categoryId;
+        public Long cityId;
+        public String minPrice;
+        public String maxPrice;
+    }
+
+    public static void markAdSold(Long adId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/" + adId + "/markSold"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
+
+    public static void deleteAd(Long adId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/" + adId))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .DELETE()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
+
+    public static class AdminUser {
+        public Long id;
+        public String username;
+        public String fullName;
+        public String status; // ACTIVE / BLOCKED
+    }
+
+    public static List<AdminUser> getUsers() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/users"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+        return gson.fromJson(response.body(), new TypeToken<List<AdminUser>>() {}.getType());
+    }
+
+    public static void blockUser(Long userId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/users/" + userId + "/block"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
+
+    public static void unblockUser(Long userId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/users/" + userId + "/unblock"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
 }
+

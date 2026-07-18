@@ -2,32 +2,39 @@ package com.silkroad.ui;
 
 import com.silkroad.api.ApiClient;
 import com.silkroad.model.Category;
+import com.silkroad.model.City;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreateAdController {
     @FXML private Label headerLabel;
     @FXML private TextField titleField;
-    @FXML private TextField descriptionField;
+    @FXML private TextArea descriptionField;
     @FXML private TextField priceField;
     @FXML private ComboBox<Category> categoryComboBox;
-    @FXML private ComboBox<String> cityComboBox; // TODO: swap for ComboBox<City> once GET /api/cities exists
-    @FXML private Button submitButton;
+    @FXML private ComboBox<City> cityComboBox;
+    @FXML private ListView<String> imagesListView;
+    @FXML private Label statusLabel;
+
+    private final List<Path> selectedImages = new ArrayList<>();
 
     @FXML
     public void initialize() {
         loadCategories();
-
-        cityComboBox.setItems(FXCollections.observableArrayList("(city list not available yet)"));
-        cityComboBox.getSelectionModel().selectFirst();
-        cityComboBox.setDisable(true);
+        loadCities();
+        imagesListView.setItems(FXCollections.observableArrayList());
     }
 
     private void loadCategories() {
@@ -36,7 +43,34 @@ public class CreateAdController {
             categoryComboBox.setItems(FXCollections.observableArrayList(categories));
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Could not load categories: " + e.getMessage());
+            statusLabel.setText("Could not load categories: " + e.getMessage());
+        }
+    }
+
+    private void loadCities() {
+        try {
+            List<City> cities = ApiClient.getCities();
+            cityComboBox.setItems(FXCollections.observableArrayList(cities));
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Could not load cities: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleChooseImages() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose images for this ad");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp"));
+
+        List<File> files = chooser.showOpenMultipleDialog(imagesListView.getScene().getWindow());
+        if (files == null) return;
+
+        ObservableList<String> names = imagesListView.getItems();
+        for (File file : files) {
+            selectedImages.add(file.toPath());
+            names.add(file.getName());
         }
     }
 
@@ -46,6 +80,7 @@ public class CreateAdController {
         String description = descriptionField.getText();
         String priceText = priceField.getText();
         Category selectedCategory = categoryComboBox.getValue();
+        City selectedCity = cityComboBox.getValue();
 
         if (isBlank(title) || isBlank(description) || isBlank(priceText)) {
             showError("Please fill in title, description, and price.");
@@ -54,6 +89,11 @@ public class CreateAdController {
 
         if (selectedCategory == null) {
             showError("Please select a category.");
+            return;
+        }
+
+        if (selectedCity == null) {
+            showError("Please select a city.");
             return;
         }
 
@@ -68,18 +108,15 @@ public class CreateAdController {
             return;
         }
 
-        // TODO: i will remove this once city selection works
-        showError("City selection isn't available yet. Ask your backend teammate to add GET /api/cities first.");
-
-        /* once a real cityId is selectable:
         try {
-            ApiClient.createAd(title, description, priceText, selectedCategory.getId(), selectedCityId);
+            ApiClient.createAd(title, description, priceText, selectedCategory.getId(), selectedCity.getId(),
+                    selectedImages);
+            Dialogs.info("Ad created! It will appear once an admin approves it.");
             SceneManager.switchScene("/fxml/home-view.fxml");
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to create ad: " + e.getMessage());
         }
-        */
     }
 
     @FXML
@@ -92,7 +129,6 @@ public class CreateAdController {
     }
 
     private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message);
-        alert.showAndWait();
+        statusLabel.setText(message);
     }
 }
