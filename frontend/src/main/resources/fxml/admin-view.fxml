@@ -11,24 +11,75 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
             <Button text="Back" onAction="#goBack"/>
-            <Label text="Pending Ads" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
         </HBox>
     </top>
     <center>
-        <ListView fx:id="pendingListView" BorderPane.alignment="CENTER"/>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+
+            <!-- Pending Ads tab -->
+            <Tab text="Pending Ads">
+                <BorderPane>
+                    <center>
+                        <ListView fx:id="pendingListView" BorderPane.alignment="CENTER"/>
+                    </center>
+                    <bottom>
+                        <VBox spacing="8">
+                            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+                            <Label text="Rejection reason (required to reject):"/>
+                            <TextArea fx:id="reasonField" prefRowCount="2" wrapText="true"/>
+                            <HBox spacing="10">
+                                <Button text="Approve" onAction="#handleApprove"/>
+                                <Button text="Reject" onAction="#handleReject"/>
+                                <Button text="Refresh" onAction="#handleRefreshPending"/>
+                            </HBox>
+                            <Label fx:id="statusLabel"/>
+                        </VBox>
+                    </bottom>
+                </BorderPane>
+            </Tab>
+
+            <!-- Categories tab -->
+            <Tab text="Categories">
+                <BorderPane>
+                    <center>
+                        <ListView fx:id="categoriesListView" BorderPane.alignment="CENTER"/>
+                    </center>
+                    <bottom>
+                        <VBox spacing="8">
+                            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+                            <TextField fx:id="categoryNameField" promptText="Category name"/>
+                            <HBox spacing="10">
+                                <Button text="Add" onAction="#handleAddCategory"/>
+                                <Button text="Rename Selected" onAction="#handleRenameCategory"/>
+                                <Button text="Delete Selected" onAction="#handleDeleteCategory"/>
+                            </HBox>
+                            <Label fx:id="categoryStatusLabel"/>
+                        </VBox>
+                    </bottom>
+                </BorderPane>
+            </Tab>
+
+            <!-- Users tab -->
+            <Tab text="Users">
+                <BorderPane>
+                    <center>
+                        <ListView fx:id="usersListView" BorderPane.alignment="CENTER"/>
+                    </center>
+                    <bottom>
+                        <VBox spacing="8">
+                            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+                            <HBox spacing="10">
+                                <Button text="Block" onAction="#handleBlockUser"/>
+                                <Button text="Unblock" onAction="#handleUnblockUser"/>
+                                <Button text="Refresh" onAction="#handleRefreshUsers"/>
+                            </HBox>
+                            <Label fx:id="usersStatusLabel"/>
+                        </VBox>
+                    </bottom>
+                </BorderPane>
+            </Tab>
+
+        </TabPane>
     </center>
-    <bottom>
-        <VBox spacing="8">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-            <Label text="Rejection reason (required to reject):"/>
-            <TextArea fx:id="reasonField" prefRowCount="2" wrapText="true"/>
-            <HBox spacing="10">
-                <Button text="Approve" onAction="#handleApprove"/>
-                <Button text="Reject" onAction="#handleReject"/>
-            </HBox>
-            <Label fx:id="statusLabel"/>
-        </VBox>
-    </bottom>
 </BorderPane>
