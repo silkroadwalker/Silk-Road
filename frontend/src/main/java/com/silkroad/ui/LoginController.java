@@ -31,8 +31,11 @@ public class LoginController {
             if (result.success) {
                 Session.set(result.token, result.username, result.role);
                 errorLabel.setVisible(false);
-                System.out.println("Logged in as: " + result.username + " (" + result.role + ")");
-                SceneManager.switchScene("/fxml/home-view.fxml");
+                if ("ADMIN".equalsIgnoreCase(result.role)) {
+                    SceneManager.switchScene("/fxml/admin-view.fxml");
+                } else {
+                    SceneManager.switchScene("/fxml/home-view.fxml");
+                }
             } else {
                 showError(result.message != null ? result.message : "Login failed.");
             }
