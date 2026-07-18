@@ -377,5 +377,36 @@ public static List<ChatSummary> getChats() throws Exception {
         return response.body();
     }
 
+    public static void updateAd(Long adId, String title, String description, String price,
+                                Long categoryId, Long cityId) throws Exception {
+        JsonObject body = new JsonObject();
+        if (title != null) body.addProperty("title", title);
+        if (description != null) body.addProperty("description", description);
+        if (price != null) body.addProperty("price", new java.math.BigDecimal(price));
+        if (categoryId != null) body.addProperty("categoryId", categoryId);
+        if (cityId != null) body.addProperty("cityId", cityId);
+
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/" + adId))
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+    }
+
+    public static List<City> getCities() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/cities"))
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+        return gson.fromJson(response.body(), new TypeToken<List<City>>() {}.getType());
+    }
 
 }
