@@ -29,11 +29,7 @@ public class MyAdsController {
 
         adListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                Ad selected = adListView.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    SceneManager.setSelectedAd(selected);
-                    SceneManager.switchScene("/fxml/ad-details-view.fxml");
-                }
+                openEditFor(adListView.getSelectionModel().getSelectedItem());
             }
         });
 
@@ -44,8 +40,69 @@ public class MyAdsController {
         try {
             List<Ad> ads = ApiClient.getMyAds();
             adListView.setItems(FXCollections.observableArrayList(ads));
+            statusLabel.setText(ads.isEmpty() ? "You haven't posted any ads yet." : "");
         } catch (Exception e) {
-            statusLabel.setText("Could not load your ads: " + e.getMessage());
+            statusLabel.setText("Could not load your ads: " + e.getMessage()
+                    + "\n(Ask your backend teammate to add GET /api/ads/my — it's not implemented yet.)");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleRefresh() {
+        loadMyAds();
+    }
+
+    @FXML
+    private void handleEdit() {
+        openEditFor(adListView.getSelectionModel().getSelectedItem());
+    }
+
+    private void openEditFor(Ad selected) {
+        if (selected == null) {
+            statusLabel.setText("Select an ad first.");
+            return;
+        }
+        SceneManager.setSelectedAd(selected);
+        SceneManager.switchScene("/fxml/edit-ad-view.fxml");
+    }
+
+    @FXML
+    private void handleMarkSold() {
+        Ad selected = adListView.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            statusLabel.setText("Select an ad first.");
+            return;
+        }
+        if (!Dialogs.confirm("Mark \"" + selected.getTitle() + "\" as sold?")) {
+            return;
+        }
+        try {
+            ApiClient.markAdSold(selected.getId());
+            statusLabel.setText("Marked as sold.");
+            loadMyAds();
+        } catch (Exception e) {
+            statusLabel.setText("Could not update status: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleDelete() {
+        Ad selected = adListView.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            statusLabel.setText("Select an ad first.");
+            return;
+        }
+        if (!Dialogs.confirm("Delete \"" + selected.getTitle() + "\"? This cannot be undone.")) {
+            return;
+        }
+        try {
+            ApiClient.deleteAd(selected.getId());
+            statusLabel.setText("Ad deleted.");
+            loadMyAds();
+        } catch (Exception e) {
+            statusLabel.setText("Could not delete ad: " + e.getMessage());
             e.printStackTrace();
         }
     }
