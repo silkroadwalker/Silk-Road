@@ -1,13 +1,10 @@
 package com.silkroad.api;
 
-import com.silkroad.model.Ad;
-import com.silkroad.model.ChatDetail;
-import com.silkroad.model.ChatSummary;
+import com.silkroad.model.*;
 import com.silkroad.ui.Session;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.silkroad.model.Category;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -329,4 +326,56 @@ public static List<ChatSummary> getChats() throws Exception {
             throw new RuntimeException("Failed to reject ad: " + response.statusCode());
         }
     }
+
+    public static void rateSeller(Long adId, int score, String comment) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("score", score);
+        body.addProperty("comment", comment);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/ads/" + adId + "/rating"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to rate seller: " + response.statusCode());
+        }
+        // no body to parse — the backend returns 201 with nothing in it
+    }
+
+    public static AdDetail getAdDetails(Long adId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/ads/" + adId))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load ad details: " + response.statusCode());
+        }
+
+        return gson.fromJson(response.body(), AdDetail.class);
+    }
+
+    public static byte[] getImageBytes(String imageUrl) throws Exception {
+        String path = imageUrl.startsWith("http") ? imageUrl.substring(imageUrl.indexOf("/api")) : imageUrl;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + path))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
+        }
+        return response.body();
+    }
+
+
 }
