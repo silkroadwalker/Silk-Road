@@ -27,7 +27,8 @@ public class ConversationsController {
                     setText(null);
                 } else {
                     setText(chat.getOtherUsername() + " - " + chat.getAdvertisementTitle()
-                            + "\n" + chat.getLastMessage());
+                            + "\n" + chat.getLastMessage()
+                            + "\n" + formatTimestamp(chat.getLastMessageTime()));
                 }
             }
         });
@@ -43,6 +44,19 @@ public class ConversationsController {
         });
 
         loadConversations();
+    }
+
+    private String formatTimestamp(String rawTimestamp) {
+        if (rawTimestamp == null || rawTimestamp.isBlank()) return "";
+        try {
+            java.time.Instant instant = java.time.Instant.parse(rawTimestamp);
+            java.time.format.DateTimeFormatter formatter =
+                    java.time.format.DateTimeFormatter.ofPattern("MMM d, HH:mm")
+                            .withZone(java.time.ZoneId.systemDefault());
+            return formatter.format(instant);
+        } catch (Exception e) {
+            return rawTimestamp;
+        }
     }
 
     private void loadConversations() {
