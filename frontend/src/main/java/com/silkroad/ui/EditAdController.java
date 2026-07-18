@@ -58,18 +58,17 @@ public class EditAdController {
         selectByName(categoryComboBox, editingAd.getCategory());
         selectByName(cityComboBox, editingAd.getCity());
 
-        // GET /api/ads/{id} only returns APPROVED ads, so this will fail for
-        // pending/rejected/sold ads owned by the user (a backend gap — the
-        // isSubmitter check exists server-side but isn't actually used to bypass
-        // the status requirement). We fall back to what the summary already gave us.
+        /* GET /api/ads/{id} only returns APPROVED ads, so this will fail for
+         pending/rejected/sold ads owned by the user (a backend gap — the
+         isSubmitter check exists server-side but isn't actually used to bypass
+         the status requirement). We fall back to what the summary already gave us. */
         try {
             AdDetail detail = ApiClient.getAdDetails(editingAd.getId());
             descriptionField.setText(detail.getDescription());
         } catch (Exception e) {
-            descriptionField.setText("");
-            statusLabel.setText("Couldn't fetch the full description for a non-approved ad "
-                    + "(backend only exposes GET /api/ads/{id} for approved ads). "
-                    + "Please re-type the description if you're changing anything else.");
+            String fallback = editingAd.getDescription();
+            descriptionField.setText(fallback != null ? fallback : "");
+            statusLabel.setText("Showing cached description — full details unavailable for non-approved ads.");
         }
     }
 
