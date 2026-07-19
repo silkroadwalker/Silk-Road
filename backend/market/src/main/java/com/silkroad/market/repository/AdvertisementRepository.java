@@ -11,15 +11,17 @@ import com.silkroad.market.entity.Category;
 import com.silkroad.market.entity.User;
 
 public interface AdvertisementRepository
-        extends JpaRepository<Advertisement, Long>,
-        JpaSpecificationExecutor<Advertisement> {
+                extends JpaRepository<Advertisement, Long>,
+                JpaSpecificationExecutor<Advertisement> {
 
-    List<Advertisement> findBySeller(User seller);
+        List<Advertisement> findBySeller(User seller);
 
-    List<Advertisement> findByCategory(Category category);
+        List<Advertisement> findBySellerUsername(String username);
 
-    List<Advertisement> findByStatus(AdvertisementStatus status);
+        List<Advertisement> findByCategory(Category category);
 
-    List<Advertisement> findByCategoryAndStatus(Category category,
-            AdvertisementStatus status);
+        List<Advertisement> findByStatus(AdvertisementStatus status);
+
+        List<Advertisement> findByCategoryAndStatus(Category category,
+                        AdvertisementStatus status);
 }

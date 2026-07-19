@@ -123,4 +123,13 @@ public class AdvertisementController {
                                 authentication.getName());
         }
 
+        @GetMapping("/my")
+        @SecurityRequirement(name = "bearerAuth")
+        public List<AdvertisementSummaryResponse> getMyAdvertisements(
+                        Authentication authentication) {
+
+                return advertisementService.getMyAdvertisements(
+                                authentication.getName());
+        }
+
 }
