@@ -512,4 +512,12 @@ public class AdvertisementService {
                                 .map(this::toSummaryResponse)
                                 .toList();
         }
+
+        public List<AdvertisementSummaryResponse> getMyAdvertisements(String username) {
+
+                return advertisementRepository.findBySellerUsername(username)
+                                .stream()
+                                .map(this::toSummaryResponse)
+                                .toList();
+        }
 }
