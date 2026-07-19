@@ -46,7 +46,7 @@
 
                 <HBox spacing="10">
                     <Button fx:id="favoriteButton" onAction="#handleToggleFavorite" text="Add to Favorites"/>
-                    <Button fx:id="messageButton" onAction="#handleMessageSeller" text="Message Seller"/>
+                    <Button fx:id="messageButton" onAction="#handleMessageSeller" text="Message Seller" styleClass="primary-button"/>
                     <Button fx:id="rateButton" onAction="#handleRateSeller" text="Rate Seller"/>
                 </HBox>
 

@@ -15,7 +15,7 @@
             <Button onAction="#goBack" text="&lt; Back" />
             <Label styleClass="page-title" text="Favorites" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button fx:id="removeButton" onAction="#handleRemoveFavorite" text="Remove" />
+            <Button fx:id="removeButton" onAction="#handleRemoveFavorite" text="Remove" styleClass="danger-button" />
         </HBox>
     </top>
     <center>

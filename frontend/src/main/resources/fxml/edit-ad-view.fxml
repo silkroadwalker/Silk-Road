@@ -24,6 +24,6 @@
         <ComboBox fx:id="categoryComboBox" layoutX="74.0" layoutY="274.0" prefHeight="27.0" prefWidth="455.0" promptText="Category" />
 
         <Label fx:id="statusLabel" layoutX="74.0" layoutY="320.0" prefWidth="455.0" styleClass="status-label" wrapText="true" />
-        <Button fx:id="submitButton" layoutX="209.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleSave" prefHeight="27.0" prefWidth="182.0" text="Save Changes" />
+        <Button fx:id="submitButton" layoutX="209.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleSave" prefHeight="27.0" prefWidth="182.0" text="Save Changes" styleClass="primary-button" />
     </children>
 </AnchorPane>

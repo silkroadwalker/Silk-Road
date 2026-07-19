@@ -21,6 +21,6 @@
 
     <Label fx:id="errorLabel" styleClass="status-label" />
 
-    <Button fx:id="loginButton" maxWidth="250" onAction="#handleLogin" text="Log In" />
+    <Button fx:id="loginButton" maxWidth="250" onAction="#handleLogin" text="Log In" styleClass="primary-button" />
     <Hyperlink fx:id="registerLink" onAction="#goToSignup" text="Don't have an account? Register" />
 </VBox>
