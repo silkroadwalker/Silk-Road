@@ -12,7 +12,7 @@
         <HBox spacing="10" alignment="CENTER_LEFT">
             <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
             <Button text="Back" onAction="#goBack"/>
-            <Label text="Ad Details" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Ad Details" styleClass="page-title"/>
         </HBox>
     </top>
 
@@ -26,31 +26,31 @@
                 <Label fx:id="titleLabel" wrapText="true">
                     <font><Font name="System Bold" size="22.0"/></font>
                 </Label>
-                <Label fx:id="priceLabel" style="-fx-font-size: 18px; -fx-text-fill: #2e7d32; -fx-font-weight: bold;"/>
-                <Label fx:id="categoryCityLabel" style="-fx-text-fill: gray;"/>
-                <Label fx:id="statusValueLabel" style="-fx-font-weight: bold;"/>
-                <Label fx:id="rejectionReasonLabel" style="-fx-text-fill: #c62828;" wrapText="true"/>
+                <Label fx:id="priceLabel" styleClass="price-label"/>
+                <Label fx:id="categoryCityLabel" styleClass="muted-label"/>
+                <Label fx:id="statusValueLabel" styleClass="muted-label"/>
+                <Label fx:id="rejectionReasonLabel" styleClass="error-label"/>
 
                 <Separator/>
 
-                <Label text="Description" style="-fx-font-weight: bold;"/>
+                <Label text="Description" styleClass="bold-label"/>
                 <Label fx:id="descriptionLabel" wrapText="true"/>
 
                 <Separator/>
 
-                <Label text="Seller" style="-fx-font-weight: bold;"/>
+                <Label text="Seller" styleClass="bold-label"/>
                 <Label fx:id="sellerLabel"/>
                 <Label fx:id="sellerRatingLabel"/>
 
-                <Label fx:id="ownerNoteLabel" style="-fx-text-fill: gray;" wrapText="true"/>
+                <Label fx:id="ownerNoteLabel" styleClass="muted-label"/>
 
                 <HBox spacing="10">
                     <Button fx:id="favoriteButton" onAction="#handleToggleFavorite" text="Add to Favorites"/>
-                    <Button fx:id="messageButton" onAction="#handleMessageSeller" text="Message Seller"/>
+                    <Button fx:id="messageButton" onAction="#handleMessageSeller" text="Message Seller" styleClass="primary-button"/>
                     <Button fx:id="rateButton" onAction="#handleRateSeller" text="Rate Seller"/>
                 </HBox>
 
-                <Label fx:id="statusLabel" style="-fx-text-fill: red;" wrapText="true"/>
+                <Label fx:id="statusLabel" styleClass="status-label"/>
             </VBox>
         </ScrollPane>
     </center>

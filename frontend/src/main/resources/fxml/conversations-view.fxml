@@ -11,7 +11,7 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
             <Button text="Back" onAction="#goBack"/>
-            <Label text="Messages" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Messages" styleClass="page-title"/>
         </HBox>
     </top>
     <center>

@@ -11,13 +11,12 @@
                 <Insets top="10" right="10" bottom="10" left="10"/>
             </padding>
             <Button text="Back" onAction="#goBack"/>
-            <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Label text="Admin Panel" styleClass="page-title"/>
         </HBox>
     </top>
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE">
 
-            <!-- Pending Ads tab -->
             <Tab text="Pending Ads">
                 <BorderPane>
                     <center>
@@ -29,8 +28,8 @@
                             <Label text="Rejection reason (required to reject):"/>
                             <TextArea fx:id="reasonField" prefRowCount="2" wrapText="true"/>
                             <HBox spacing="10">
-                                <Button text="Approve" onAction="#handleApprove"/>
-                                <Button text="Reject" onAction="#handleReject"/>
+                                <Button text="Approve" onAction="#handleApprove" styleClass="primary-button"/>
+                                <Button text="Reject" onAction="#handleReject" styleClass="danger-button"/>
                                 <Button text="Refresh" onAction="#handleRefreshPending"/>
                             </HBox>
                             <Label fx:id="statusLabel"/>
@@ -39,7 +38,6 @@
                 </BorderPane>
             </Tab>
 
-            <!-- Categories tab -->
             <Tab text="Categories">
                 <BorderPane>
                     <center>
@@ -50,9 +48,9 @@
                             <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
                             <TextField fx:id="categoryNameField" promptText="Category name"/>
                             <HBox spacing="10">
-                                <Button text="Add" onAction="#handleAddCategory"/>
+                                <Button text="Add" onAction="#handleAddCategory" styleClass="primary-button"/>
                                 <Button text="Rename Selected" onAction="#handleRenameCategory"/>
-                                <Button text="Delete Selected" onAction="#handleDeleteCategory"/>
+                                <Button text="Delete Selected" onAction="#handleDeleteCategory" styleClass="danger-button"/>
                             </HBox>
                             <Label fx:id="categoryStatusLabel"/>
                         </VBox>
@@ -60,7 +58,6 @@
                 </BorderPane>
             </Tab>
 
-            <!-- Users tab -->
             <Tab text="Users">
                 <BorderPane>
                     <center>
@@ -70,8 +67,8 @@
                         <VBox spacing="8">
                             <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
                             <HBox spacing="10">
-                                <Button text="Block" onAction="#handleBlockUser"/>
-                                <Button text="Unblock" onAction="#handleUnblockUser"/>
+                                <Button text="Block" onAction="#handleBlockUser" styleClass="danger-button"/>
+                                <Button text="Unblock" onAction="#handleUnblockUser" styleClass="primary-button"/>
                                 <Button text="Refresh" onAction="#handleRefreshUsers"/>
                             </HBox>
                             <Label fx:id="usersStatusLabel"/>

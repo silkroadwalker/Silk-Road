@@ -13,9 +13,9 @@
         <VBox>
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <padding><Insets top="10" right="10" bottom="5" left="10"/></padding>
-                <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Label fx:id="welcomeLabel" text="Welcome!" styleClass="page-title"/>
                 <Pane HBox.hgrow="ALWAYS"/>
-                <Button text="Create Ad" onAction="#goToCreateAd"/>
+                <Button text="Create Ad" onAction="#goToCreateAd" styleClass="primary-button"/>
                 <Button text="My Ads" onAction="#goToMyAds"/>
                 <Button text="Favorites" onAction="#goToFavorites"/>
                 <Button text="Messages" onAction="#goToMessages"/>
@@ -31,7 +31,7 @@
                 <TextField fx:id="minPriceField" promptText="Min price" prefWidth="90"/>
                 <TextField fx:id="maxPriceField" promptText="Max price" prefWidth="90"/>
                 <ComboBox fx:id="sortBox" promptText="Sort by" prefWidth="150"/>
-                <Button text="Search" onAction="#handleSearch"/>
+                <Button text="Search" onAction="#handleSearch" styleClass="primary-button"/>
                 <Button text="Clear" onAction="#handleClearFilters"/>
             </HBox>
         </VBox>
