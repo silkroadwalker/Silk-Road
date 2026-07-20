@@ -7,6 +7,7 @@ import com.silkroad.model.City;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,7 +30,7 @@ public class HomeController {
     @FXML
     private ComboBox<String> sortBox;
     @FXML
-    private ListView<Ad> adListView;
+    private FlowPane adsFlowPane;
     @FXML
     private Label statusLabel;
 
@@ -45,25 +46,6 @@ public class HomeController {
             adminButton.setVisible(true);
             adminButton.setManaged(true);
         }
-
-        adListView.setCellFactory(list -> new ListCell<>() {
-            @Override
-            protected void updateItem(Ad ad, boolean empty) {
-                super.updateItem(ad, empty);
-                setText(empty || ad == null ? null
-                        : ad.getTitle() + " - $" + ad.getPrice() + " (" + ad.getCity() + ", " + ad.getCategory() + ")");
-            }
-        });
-
-        adListView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                Ad selected = adListView.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    SceneManager.setSelectedAd(selected);
-                    SceneManager.switchScene("/fxml/ad-details-view.fxml");
-                }
-            }
-        });
 
         sortBox.setItems(FXCollections.observableArrayList(SORT_NEWEST, SORT_CHEAPEST, SORT_EXPENSIVE));
 
@@ -90,12 +72,25 @@ public class HomeController {
     private void loadAds() {
         try {
             List<Ad> ads = ApiClient.getAds();
-            adListView.setItems(FXCollections.observableArrayList(ads));
+            renderAds(ads);
             statusLabel.setText(ads.isEmpty() ? "No ads found." : "");
         } catch (Exception e) {
             statusLabel.setText("Could not load ads: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void renderAds(List<Ad> ads) {
+        adsFlowPane.getChildren().clear();
+        for (Ad ad : ads) {
+            adsFlowPane.getChildren().add(
+                    UiComponents.buildAdCard(ad, false, null, () -> openAd(ad)));
+        }
+    }
+
+    private void openAd(Ad ad) {
+        SceneManager.setSelectedAd(ad);
+        SceneManager.switchScene("/fxml/ad-details-view.fxml");
     }
 
     @FXML
@@ -130,7 +125,7 @@ public class HomeController {
         try {
             List<Ad> results = ApiClient.searchAds(filter);
             results = applySort(results);
-            adListView.setItems(FXCollections.observableArrayList(results));
+            renderAds(results);
             statusLabel.setText(results.isEmpty() ? "No ads match your search." : "");
         } catch (Exception e) {
             statusLabel.setText("Search failed: " + e.getMessage());

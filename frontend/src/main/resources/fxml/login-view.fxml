@@ -6,21 +6,33 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.silkroad.ui.LoginController">
-    <padding>
-        <Insets bottom="40" left="40" right="40" top="40" />
-    </padding>
+<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.silkroad.ui.LoginController"
+           prefWidth="1000" prefHeight="680" styleClass="page-body">
 
-    <Label styleClass="page-title" />
-    <Label text="Login to your account" />
+    <VBox alignment="CENTER" maxWidth="360" maxHeight="-Infinity" spacing="14" styleClass="auth-card">
+        <padding><Insets top="36" right="36" bottom="36" left="36"/></padding>
 
-    <TextField fx:id="usernameField" maxWidth="250" promptText="Username" />
-    <PasswordField fx:id="passwordField" maxWidth="250" promptText="Password" />
+        <Label text="Silk-Road" styleClass="page-title"/>
+        <Label text="Log in to buy and sell with your community" styleClass="auth-subtitle" wrapText="true" alignment="CENTER"/>
 
-    <Label fx:id="errorLabel" styleClass="status-label" />
+        <VBox spacing="6" maxWidth="280">
+            <Label text="Username" styleClass="field-label"/>
+            <TextField fx:id="usernameField" promptText="Username"/>
+        </VBox>
 
-    <Button fx:id="loginButton" maxWidth="250" onAction="#handleLogin" text="Log In" styleClass="primary-button" />
-    <Hyperlink fx:id="registerLink" onAction="#goToSignup" text="Don't have an account? Register" />
-</VBox>
+        <VBox spacing="6" maxWidth="280">
+            <Label text="Password" styleClass="field-label"/>
+            <PasswordField fx:id="passwordField" promptText="Password"/>
+        </VBox>
+
+        <Label fx:id="errorLabel" styleClass="status-label" wrapText="true" maxWidth="280"/>
+
+        <Button fx:id="loginButton" maxWidth="280" onAction="#handleLogin" text="Log In" styleClass="primary-button"/>
+        <Hyperlink fx:id="registerLink" onAction="#goToSignup" text="Don't have an account? Register"/>
+    </VBox>
+
+</StackPane>

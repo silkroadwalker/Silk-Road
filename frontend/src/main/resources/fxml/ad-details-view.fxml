@@ -3,46 +3,47 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.silkroad.ui.AdDetailsController" prefWidth="750" prefHeight="650">
+            fx:controller="com.silkroad.ui.AdDetailsController"
+            prefWidth="1000" prefHeight="680" styleClass="page-body">
 
     <top>
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-            <Button text="Back" onAction="#goBack"/>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="top-bar">
+            <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+            <Button text="&lt; Back" onAction="#goBack" styleClass="back-button"/>
             <Label text="Ad Details" styleClass="page-title"/>
         </HBox>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true">
-            <VBox spacing="12">
-                <padding><Insets top="10" right="20" bottom="20" left="20"/></padding>
+        <ScrollPane fitToWidth="true" styleClass="ads-grid-scroll">
+            <VBox spacing="14" maxWidth="760">
+                <padding><Insets top="16" right="16" bottom="24" left="16"/></padding>
 
                 <HBox fx:id="imagesBox" spacing="8"/>
 
-                <Label fx:id="titleLabel" wrapText="true">
-                    <font><Font name="System Bold" size="22.0"/></font>
-                </Label>
-                <Label fx:id="priceLabel" styleClass="price-label"/>
-                <Label fx:id="categoryCityLabel" styleClass="muted-label"/>
-                <Label fx:id="statusValueLabel" styleClass="muted-label"/>
-                <Label fx:id="rejectionReasonLabel" styleClass="error-label"/>
+                <VBox spacing="8" styleClass="detail-card">
+                    <Label fx:id="titleLabel" wrapText="true" styleClass="detail-title"/>
+                    <Label fx:id="priceLabel" styleClass="price-label"/>
+                    <Label fx:id="categoryCityLabel" styleClass="muted-label"/>
+                    <Label fx:id="statusValueLabel" styleClass="muted-label"/>
+                    <Label fx:id="rejectionReasonLabel" styleClass="error-label" wrapText="true"/>
+                </VBox>
 
-                <Separator/>
+                <VBox spacing="8" styleClass="detail-card">
+                    <Label text="Description" styleClass="section-title"/>
+                    <Label fx:id="descriptionLabel" wrapText="true"/>
+                </VBox>
 
-                <Label text="Description" styleClass="bold-label"/>
-                <Label fx:id="descriptionLabel" wrapText="true"/>
-
-                <Separator/>
-
-                <Label text="Seller" styleClass="bold-label"/>
-                <Label fx:id="sellerLabel"/>
-                <Label fx:id="sellerRatingLabel"/>
-
-                <Label fx:id="ownerNoteLabel" styleClass="muted-label"/>
+                <VBox spacing="8" styleClass="detail-card">
+                    <Label text="Seller" styleClass="section-title"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label fx:id="sellerLabel"/>
+                    </HBox>
+                    <Label fx:id="sellerRatingLabel" styleClass="muted-label"/>
+                    <Label fx:id="ownerNoteLabel" styleClass="muted-label" wrapText="true"/>
+                </VBox>
 
                 <HBox spacing="10">
                     <Button fx:id="favoriteButton" onAction="#handleToggleFavorite" text="Add to Favorites"/>
@@ -50,7 +51,7 @@
                     <Button fx:id="rateButton" onAction="#handleRateSeller" text="Rate Seller"/>
                 </HBox>
 
-                <Label fx:id="statusLabel" styleClass="status-label"/>
+                <Label fx:id="statusLabel" styleClass="status-label" wrapText="true"/>
             </VBox>
         </ScrollPane>
     </center>
