@@ -10,6 +10,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Rectangle;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -70,6 +71,8 @@ public class AdDetailsController {
         }
 
         sellerLabel.setText(ad.getSellerFullName() + " (@" + ad.getSellerUsername() + ") · " + ad.getSellerPhone());
+        sellerLabel.setGraphic(UiComponents.avatar(ad.getSellerFullName(), 32));
+        sellerLabel.setGraphicTextGap(10);
 
         Double avg = ad.getAverageRating();
         if (avg != null && avg > 0) {
@@ -101,9 +104,20 @@ public class AdDetailsController {
         for (String url : urls) {
             try {
                 byte[] bytes = ApiClient.getImageBytes(url);
-                ImageView view = new ImageView(new Image(new ByteArrayInputStream(bytes)));
-                view.setFitHeight(160);
+                Image image = new Image(new ByteArrayInputStream(bytes));
+                ImageView view = new ImageView(image);
+                double fitHeight = 180;
+                view.setFitHeight(fitHeight);
                 view.setPreserveRatio(true);
+
+                double renderedWidth = image.getHeight() > 0
+                        ? fitHeight * (image.getWidth() / image.getHeight())
+                        : fitHeight;
+
+                Rectangle clip = new Rectangle(renderedWidth, fitHeight);
+                clip.setArcWidth(14);
+                clip.setArcHeight(14);
+                view.setClip(clip);
                 imagesBox.getChildren().add(view);
             } catch (Exception e) {
                 e.printStackTrace();

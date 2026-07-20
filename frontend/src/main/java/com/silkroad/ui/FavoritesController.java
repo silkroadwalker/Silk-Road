@@ -2,51 +2,29 @@ package com.silkroad.ui;
 
 import com.silkroad.api.ApiClient;
 import com.silkroad.model.Ad;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.layout.FlowPane;
 
 import java.util.List;
 
 public class FavoritesController {
 
     @FXML
-    private ListView<Ad> favoritesListView;
+    private FlowPane favoritesFlowPane;
     @FXML
     private Label statusLabel;
-    @FXML
-    private Button removeButton;
 
     @FXML
     public void initialize() {
-        favoritesListView.setCellFactory(list -> new ListCell<>() {
-            @Override
-            protected void updateItem(Ad ad, boolean empty) {
-                super.updateItem(ad, empty);
-                setText(empty || ad == null ? null : ad.getTitle() + " - $" + ad.getPrice() + " (" + ad.getCity() + ")");
-            }
-        });
-
-        favoritesListView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                Ad selected = favoritesListView.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    SceneManager.setSelectedAd(selected);
-                    SceneManager.switchScene("/fxml/ad-details-view.fxml");
-                }
-            }
-        });
-
         loadFavorites();
     }
 
     private void loadFavorites() {
         try {
             List<Ad> favorites = ApiClient.getFavorites();
-            favoritesListView.setItems(FXCollections.observableArrayList(favorites));
+            renderFavorites(favorites);
             statusLabel.setText(favorites.isEmpty() ? "You have no favorites yet." : "");
         } catch (Exception e) {
             statusLabel.setText("Could not load favorites: " + e.getMessage());
@@ -54,15 +32,26 @@ public class FavoritesController {
         }
     }
 
-    @FXML
-    private void handleRemoveFavorite() {
-        Ad selected = favoritesListView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            statusLabel.setText("Select an ad to remove first.");
-            return;
+    private void renderFavorites(List<Ad> favorites) {
+        favoritesFlowPane.getChildren().clear();
+        for (Ad ad : favorites) {
+            Button removeButton = new Button("Remove");
+            removeButton.getStyleClass().add("danger-button");
+            removeButton.setOnAction(e -> handleRemoveFavorite(ad));
+
+            favoritesFlowPane.getChildren().add(
+                    UiComponents.buildAdCard(ad, false, List.of(removeButton), () -> openAd(ad)));
         }
+    }
+
+    private void openAd(Ad ad) {
+        SceneManager.setSelectedAd(ad);
+        SceneManager.switchScene("/fxml/ad-details-view.fxml");
+    }
+
+    private void handleRemoveFavorite(Ad ad) {
         try {
-            ApiClient.removeFavorite(selected.getId());
+            ApiClient.removeFavorite(ad.getId());
             loadFavorites();
         } catch (Exception e) {
             statusLabel.setText("Could not remove favorite: " + e.getMessage());

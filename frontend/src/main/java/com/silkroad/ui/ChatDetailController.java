@@ -3,40 +3,36 @@ package com.silkroad.ui;
 import com.silkroad.api.ApiClient;
 import com.silkroad.model.ChatDetail;
 import com.silkroad.model.ChatMessage;
-import javafx.collections.FXCollections;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ChatDetailController {
 
     @FXML private Label adTitleLabel;
-    @FXML private ListView<ChatMessage> messagesListView;
+    @FXML private ScrollPane messagesScroll;
+    @FXML private VBox messagesBox;
     @FXML private TextField messageField;
     @FXML private Label statusLabel;
 
     private Long chatId;
 
+    private static final double BUBBLE_MAX_WIDTH = 420;
+
     @FXML
     public void initialize() {
         chatId = SceneManager.getSelectedChatId();
-
-        messagesListView.setCellFactory(list -> new ListCell<>() {
-            @Override
-            protected void updateItem(ChatMessage message, boolean empty) {
-                super.updateItem(message, empty);
-                if (empty || message == null) {
-                    setText(null);
-                } else {
-                    boolean mine = message.getSenderUsername() != null
-                            && message.getSenderUsername().equalsIgnoreCase(Session.getUsername());
-                    String who = mine ? "You" : message.getSenderUsername();
-                    setText("[" + message.getSentAt() + "] " + who + ": " + message.getContent());
-                }
-            }
-        });
 
         if (chatId == null) {
             statusLabel.setText("No conversation selected.");
@@ -50,11 +46,65 @@ public class ChatDetailController {
         try {
             ChatDetail detail = ApiClient.getChat(chatId);
             adTitleLabel.setText(detail.getAdvertisementTitle());
-            messagesListView.setItems(FXCollections.observableArrayList(detail.getMessages()));
-            messagesListView.scrollTo(messagesListView.getItems().size() - 1);
+            renderMessages(detail);
         } catch (Exception e) {
             statusLabel.setText("Could not load conversation: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void renderMessages(ChatDetail detail) {
+        messagesBox.getChildren().clear();
+
+        if (detail.getMessages() != null) {
+            for (ChatMessage message : detail.getMessages()) {
+                messagesBox.getChildren().add(buildBubbleRow(message));
+            }
+        }
+
+        Platform.runLater(() -> messagesScroll.setVvalue(1.0));
+    }
+
+    private HBox buildBubbleRow(ChatMessage message) {
+        boolean mine = message.getSenderUsername() != null
+                && message.getSenderUsername().equalsIgnoreCase(Session.getUsername());
+
+        Label text = new Label(message.getContent());
+        text.getStyleClass().add("bubble-text");
+        text.setWrapText(true);
+        text.setMaxWidth(BUBBLE_MAX_WIDTH - 26);
+
+        Label time = new Label(formatTimestamp(message.getSentAt()));
+        time.getStyleClass().add("bubble-time");
+
+        VBox bubble = new VBox(4, text, time);
+        bubble.setMaxWidth(BUBBLE_MAX_WIDTH);
+        bubble.getStyleClass().add(mine ? "bubble-mine" : "bubble-theirs");
+        if (mine) {
+            time.setStyle("-fx-text-fill: rgba(255,255,255,0.75);");
+        }
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox row = new HBox(8);
+        row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+        if (mine) {
+            row.getChildren().addAll(spacer, bubble);
+        } else {
+            row.getChildren().addAll(bubble, spacer);
+        }
+        return row;
+    }
+
+    /** Backend sends a plain LocalDateTime (no zone), so parse it as one. */
+    private String formatTimestamp(String rawTimestamp) {
+        if (rawTimestamp == null || rawTimestamp.isBlank()) return "";
+        try {
+            LocalDateTime dateTime = LocalDateTime.parse(rawTimestamp);
+            return dateTime.format(DateTimeFormatter.ofPattern("MMM d, HH:mm"));
+        } catch (Exception e) {
+            return rawTimestamp;
         }
     }
 

@@ -2,60 +2,66 @@ package com.silkroad.ui;
 
 import com.silkroad.api.ApiClient;
 import com.silkroad.model.Ad;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.layout.FlowPane;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyAdsController {
 
     @FXML
-    private ListView<Ad> adListView;
+    private FlowPane myAdsFlowPane;
     @FXML
     private Label statusLabel;
 
     @FXML
     public void initialize() {
-        adListView.setCellFactory(list -> new ListCell<>() {
-            @Override
-            protected void updateItem(Ad ad, boolean empty) {
-                super.updateItem(ad, empty);
-                setText(empty || ad == null ? null : ad.getTitle() + " - $" + ad.getPrice() + " [" + ad.getStatus() + "]");
-            }
-        });
-
-        adListView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                openEditFor(adListView.getSelectionModel().getSelectedItem());
-            }
-        });
-
         loadMyAds();
     }
 
     private void loadMyAds() {
         try {
             List<Ad> ads = ApiClient.getMyAds();
-            adListView.setItems(FXCollections.observableArrayList(ads));
+            renderAds(ads);
             statusLabel.setText(ads.isEmpty() ? "You haven't posted any ads yet." : "");
         } catch (Exception e) {
-            statusLabel.setText("Could not load your ads: " + e.getMessage()
-                    + "\n(Ask your backend teammate to add GET /api/ads/my — it's not implemented yet.)");
+            statusLabel.setText("Could not load your ads: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void renderAds(List<Ad> ads) {
+        myAdsFlowPane.getChildren().clear();
+        for (Ad ad : ads) {
+            List<Node> actions = new ArrayList<>();
+
+            Button editButton = new Button("Edit");
+            editButton.setOnAction(e -> openEditFor(ad));
+            actions.add(editButton);
+
+            if (!"SOLD".equalsIgnoreCase(ad.getStatus())) {
+                Button markSoldButton = new Button("Mark Sold");
+                markSoldButton.setOnAction(e -> handleMarkSold(ad));
+                actions.add(markSoldButton);
+            }
+
+            Button deleteButton = new Button("Delete");
+            deleteButton.getStyleClass().add("danger-button");
+            deleteButton.setOnAction(e -> handleDelete(ad));
+            actions.add(deleteButton);
+
+            myAdsFlowPane.getChildren().add(
+                    UiComponents.buildAdCard(ad, true, actions, () -> openEditFor(ad)));
         }
     }
 
     @FXML
     private void handleRefresh() {
         loadMyAds();
-    }
-
-    @FXML
-    private void handleEdit() {
-        openEditFor(adListView.getSelectionModel().getSelectedItem());
     }
 
     private void openEditFor(Ad selected) {
@@ -67,13 +73,7 @@ public class MyAdsController {
         SceneManager.switchScene("/fxml/edit-ad-view.fxml");
     }
 
-    @FXML
-    private void handleMarkSold() {
-        Ad selected = adListView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            statusLabel.setText("Select an ad first.");
-            return;
-        }
+    private void handleMarkSold(Ad selected) {
         if (!Dialogs.confirm("Mark \"" + selected.getTitle() + "\" as sold?")) {
             return;
         }
@@ -87,13 +87,7 @@ public class MyAdsController {
         }
     }
 
-    @FXML
-    private void handleDelete() {
-        Ad selected = adListView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            statusLabel.setText("Select an ad first.");
-            return;
-        }
+    private void handleDelete(Ad selected) {
         if (!Dialogs.confirm("Delete \"" + selected.getTitle() + "\"? This cannot be undone.")) {
             return;
         }
