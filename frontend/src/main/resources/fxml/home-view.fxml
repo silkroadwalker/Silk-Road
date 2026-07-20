@@ -4,15 +4,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.silkroad.ui.HomeController"
-            prefWidth="900" prefHeight="650">
+            prefWidth="1000" prefHeight="680" styleClass="page-body">
 
     <top>
-        <VBox>
+        <VBox styleClass="top-bar">
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <padding><Insets top="10" right="10" bottom="5" left="10"/></padding>
+                <padding><Insets top="12" right="16" bottom="8" left="16"/></padding>
                 <Label fx:id="welcomeLabel" text="Welcome!" styleClass="page-title"/>
                 <Pane HBox.hgrow="ALWAYS"/>
                 <Button text="Create Ad" onAction="#goToCreateAd" styleClass="primary-button"/>
@@ -23,14 +23,14 @@
                 <Button text="Logout" onAction="#handleLogout"/>
             </HBox>
 
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <padding><Insets top="5" right="10" bottom="10" left="10"/></padding>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <padding><Insets top="0" right="16" bottom="12" left="16"/></padding>
                 <TextField fx:id="searchField" promptText="Search ads..." HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="categoryFilterBox" promptText="Category" prefWidth="140"/>
-                <ComboBox fx:id="cityFilterBox" promptText="City" prefWidth="140"/>
-                <TextField fx:id="minPriceField" promptText="Min price" prefWidth="90"/>
-                <TextField fx:id="maxPriceField" promptText="Max price" prefWidth="90"/>
-                <ComboBox fx:id="sortBox" promptText="Sort by" prefWidth="150"/>
+                <ComboBox fx:id="categoryFilterBox" promptText="Category" prefWidth="130"/>
+                <ComboBox fx:id="cityFilterBox" promptText="City" prefWidth="130"/>
+                <TextField fx:id="minPriceField" promptText="Min price" prefWidth="80"/>
+                <TextField fx:id="maxPriceField" promptText="Max price" prefWidth="80"/>
+                <ComboBox fx:id="sortBox" promptText="Sort by" prefWidth="140"/>
                 <Button text="Search" onAction="#handleSearch" styleClass="primary-button"/>
                 <Button text="Clear" onAction="#handleClearFilters"/>
             </HBox>
@@ -38,15 +38,17 @@
     </top>
 
     <center>
-        <VBox spacing="10">
-            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-            <ListView fx:id="adListView" VBox.vgrow="ALWAYS"/>
-        </VBox>
+        <ScrollPane fitToWidth="true" styleClass="ads-grid-scroll">
+            <VBox>
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                <FlowPane fx:id="adsFlowPane" hgap="16" vgap="16"/>
+            </VBox>
+        </ScrollPane>
     </center>
 
     <bottom>
-        <Label fx:id="statusLabel">
-            <padding><Insets top="0" right="10" bottom="10" left="10"/></padding>
+        <Label fx:id="statusLabel" styleClass="empty-state">
+            <padding><Insets top="0" right="16" bottom="12" left="16"/></padding>
         </Label>
     </bottom>
 

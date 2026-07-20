@@ -5,27 +5,29 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.silkroad.ui.ChatDetailController" prefWidth="700" prefHeight="600">
+            fx:controller="com.silkroad.ui.ChatDetailController"
+            prefWidth="1000" prefHeight="680" styleClass="page-body">
 
     <top>
-        <VBox>
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <padding><Insets top="10" right="10" bottom="5" left="10"/></padding>
-                <Button text="Back" onAction="#goBack"/>
-                <Label fx:id="adTitleLabel" styleClass="page-title"/>
-            </HBox>
-            <Separator/>
-        </VBox>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="top-bar">
+            <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+            <Button text="&lt; Back" onAction="#goBack" styleClass="back-button"/>
+            <Label fx:id="adTitleLabel" styleClass="page-title"/>
+        </HBox>
     </top>
 
     <center>
-        <ListView fx:id="messagesListView" BorderPane.alignment="CENTER"/>
+        <ScrollPane fx:id="messagesScroll" fitToWidth="true" styleClass="ads-grid-scroll">
+            <VBox fx:id="messagesBox" spacing="10">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+            </VBox>
+        </ScrollPane>
     </center>
 
     <bottom>
-        <VBox spacing="8">
-            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-            <Label fx:id="statusLabel" styleClass="page-title"/>
+        <VBox spacing="8" styleClass="top-bar">
+            <padding><Insets top="10" right="16" bottom="14" left="16"/></padding>
+            <Label fx:id="statusLabel" styleClass="empty-state"/>
             <HBox spacing="10">
                 <TextField fx:id="messageField" promptText="Type a message..." HBox.hgrow="ALWAYS"/>
                 <Button text="Send" onAction="#handleSend" styleClass="primary-button"/>

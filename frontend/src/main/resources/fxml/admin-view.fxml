@@ -4,13 +4,14 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.silkroad.ui.AdminController" prefWidth="800" prefHeight="600">
+            fx:controller="com.silkroad.ui.AdminController"
+            prefWidth="1000" prefHeight="680" styleClass="page-body">
     <top>
-        <HBox spacing="10" alignment="CENTER_LEFT">
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="top-bar">
             <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
+                <Insets top="12" right="16" bottom="12" left="16"/>
             </padding>
-            <Button text="Back" onAction="#goBack"/>
+            <Button text="&lt; Back" onAction="#goBack" styleClass="back-button"/>
             <Label text="Admin Panel" styleClass="page-title"/>
         </HBox>
     </top>
@@ -18,60 +19,66 @@
         <TabPane tabClosingPolicy="UNAVAILABLE">
 
             <Tab text="Pending Ads">
-                <BorderPane>
+                <BorderPane styleClass="page-body">
                     <center>
-                        <ListView fx:id="pendingListView" BorderPane.alignment="CENTER"/>
+                        <ListView fx:id="pendingListView" BorderPane.alignment="CENTER">
+                            <BorderPane.margin><Insets top="12" right="12" bottom="0" left="12"/></BorderPane.margin>
+                        </ListView>
                     </center>
                     <bottom>
                         <VBox spacing="8">
-                            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
-                            <Label text="Rejection reason (required to reject):"/>
+                            <padding><Insets top="10" right="12" bottom="12" left="12"/></padding>
+                            <Label text="Rejection reason (required to reject):" styleClass="field-label"/>
                             <TextArea fx:id="reasonField" prefRowCount="2" wrapText="true"/>
                             <HBox spacing="10">
                                 <Button text="Approve" onAction="#handleApprove" styleClass="primary-button"/>
                                 <Button text="Reject" onAction="#handleReject" styleClass="danger-button"/>
                                 <Button text="Refresh" onAction="#handleRefreshPending"/>
                             </HBox>
-                            <Label fx:id="statusLabel"/>
+                            <Label fx:id="statusLabel" styleClass="empty-state"/>
                         </VBox>
                     </bottom>
                 </BorderPane>
             </Tab>
 
             <Tab text="Categories">
-                <BorderPane>
+                <BorderPane styleClass="page-body">
                     <center>
-                        <ListView fx:id="categoriesListView" BorderPane.alignment="CENTER"/>
+                        <ListView fx:id="categoriesListView" BorderPane.alignment="CENTER">
+                            <BorderPane.margin><Insets top="12" right="12" bottom="0" left="12"/></BorderPane.margin>
+                        </ListView>
                     </center>
                     <bottom>
                         <VBox spacing="8">
-                            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+                            <padding><Insets top="10" right="12" bottom="12" left="12"/></padding>
                             <TextField fx:id="categoryNameField" promptText="Category name"/>
                             <HBox spacing="10">
                                 <Button text="Add" onAction="#handleAddCategory" styleClass="primary-button"/>
                                 <Button text="Rename Selected" onAction="#handleRenameCategory"/>
                                 <Button text="Delete Selected" onAction="#handleDeleteCategory" styleClass="danger-button"/>
                             </HBox>
-                            <Label fx:id="categoryStatusLabel"/>
+                            <Label fx:id="categoryStatusLabel" styleClass="empty-state"/>
                         </VBox>
                     </bottom>
                 </BorderPane>
             </Tab>
 
             <Tab text="Users">
-                <BorderPane>
+                <BorderPane styleClass="page-body">
                     <center>
-                        <ListView fx:id="usersListView" BorderPane.alignment="CENTER"/>
+                        <ListView fx:id="usersListView" BorderPane.alignment="CENTER">
+                            <BorderPane.margin><Insets top="12" right="12" bottom="0" left="12"/></BorderPane.margin>
+                        </ListView>
                     </center>
                     <bottom>
                         <VBox spacing="8">
-                            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+                            <padding><Insets top="10" right="12" bottom="12" left="12"/></padding>
                             <HBox spacing="10">
                                 <Button text="Block" onAction="#handleBlockUser" styleClass="danger-button"/>
                                 <Button text="Unblock" onAction="#handleUnblockUser" styleClass="primary-button"/>
                                 <Button text="Refresh" onAction="#handleRefreshUsers"/>
                             </HBox>
-                            <Label fx:id="usersStatusLabel"/>
+                            <Label fx:id="usersStatusLabel" styleClass="empty-state" wrapText="true"/>
                         </VBox>
                     </bottom>
                 </BorderPane>
