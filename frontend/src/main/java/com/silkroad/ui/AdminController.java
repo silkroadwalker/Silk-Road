@@ -5,16 +5,36 @@ import com.silkroad.model.Ad;
 import com.silkroad.model.Category;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class AdminController {
 
+    // --- Dashboard tab ---
+    @FXML private Label totalUsersLabel;
+    @FXML private Label pendingAdsCountLabel;
+    @FXML private Label activeAdsCountLabel;
+    @FXML private Label dashboardNoteLabel;
+    @FXML private BarChart<String, Number> dashboardChart;
+
     // --- Pending ads tab ---
-    @FXML private ListView<Ad> pendingListView;
-    @FXML private TextArea reasonField;
+    @FXML private FlowPane pendingFlowPane;
     @FXML private Label statusLabel;
+
+    // --- All ads tab ---
+    @FXML private TextField allAdsSearchField;
+    @FXML private FlowPane allAdsFlowPane;
+    @FXML private Label allAdsStatusLabel;
+    private List<Ad> allAdsCache = new ArrayList<>();
 
     // --- Categories tab ---
     @FXML private ListView<Category> categoriesListView;
@@ -27,15 +47,8 @@ public class AdminController {
 
     @FXML
     public void initialize() {
-        pendingListView.setCellFactory(list -> new ListCell<>() {
-            @Override
-            protected void updateItem(Ad ad, boolean empty) {
-                super.updateItem(ad, empty);
-                setText(empty || ad == null ? null
-                        : ad.getTitle() + " - $" + ad.getPrice() + " (seller: " + ad.getSellerUsername() + ")");
-            }
-        });
         loadPendingAds();
+        loadAllAds();
 
         categoriesListView.setCellFactory(list -> new ListCell<>() {
             @Override
@@ -55,6 +68,72 @@ public class AdminController {
             }
         });
         loadUsers();
+
+        loadDashboard();
+    }
+
+    private void openAdDetails(Ad ad) {
+        SceneManager.setSelectedAd(ad);
+        SceneManager.setViewingAsAdmin(true);
+        SceneManager.setReturnScene("/fxml/admin-view.fxml");
+        SceneManager.switchScene("/fxml/ad-details-view.fxml");
+    }
+
+    // ---------------------------------------------------------------
+    // Dashboard
+    // ---------------------------------------------------------------
+
+    private void loadDashboard() {
+        StringBuilder note = new StringBuilder();
+
+        int totalUsers = -1;
+        int pendingCount = -1;
+        int activeCount = -1;
+
+        try {
+            totalUsers = ApiClient.getUsers().size();
+            totalUsersLabel.setText("Total users: " + totalUsers);
+        } catch (Exception e) {
+            totalUsersLabel.setText("Total users: —");
+            note.append("User count needs the backend's /api/admin/users endpoint. ");
+        }
+
+        try {
+            pendingCount = ApiClient.getPendingAds().size();
+            pendingAdsCountLabel.setText("Pending ads: " + pendingCount);
+        } catch (Exception e) {
+            pendingAdsCountLabel.setText("Pending ads: —");
+            note.append("Could not load pending ads. ");
+        }
+
+        try {
+            activeCount = ApiClient.getAds().size();
+            activeAdsCountLabel.setText("Active ads: " + activeCount);
+        } catch (Exception e) {
+            activeAdsCountLabel.setText("Active ads: —");
+            note.append("Could not load active ads. ");
+        }
+
+        note.append("Rejected/sold/deleted ad counts and a reports count aren't shown yet "
+                + "because the backend doesn't expose that data.");
+        dashboardNoteLabel.setText(note.toString());
+
+        renderDashboardChart(totalUsers, pendingCount, activeCount);
+    }
+
+    private void renderDashboardChart(int totalUsers, int pendingCount, int activeCount) {
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.getData().add(new XYChart.Data<>("Users", Math.max(totalUsers, 0)));
+        series.getData().add(new XYChart.Data<>("Pending Ads", Math.max(pendingCount, 0)));
+        series.getData().add(new XYChart.Data<>("Active Ads", Math.max(activeCount, 0)));
+
+        dashboardChart.getData().clear();
+        dashboardChart.getData().add(series);
+    }
+
+    @FXML
+    private void handleRefreshDashboard() {
+        loadDashboard();
     }
 
     // ---------------------------------------------------------------
@@ -64,11 +143,40 @@ public class AdminController {
     private void loadPendingAds() {
         try {
             List<Ad> pending = ApiClient.getPendingAds();
-            pendingListView.setItems(FXCollections.observableArrayList(pending));
+            renderPendingAds(pending);
             statusLabel.setText(pending.isEmpty() ? "No ads pending review." : "");
         } catch (Exception e) {
             statusLabel.setText("Could not load pending ads: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void renderPendingAds(List<Ad> ads) {
+        pendingFlowPane.getChildren().clear();
+        for (Ad ad : ads) {
+            List<Node> actions = new ArrayList<>();
+
+            Button viewButton = new Button("View Details");
+            viewButton.setOnAction(e -> openAdDetails(ad));
+            actions.add(viewButton);
+
+            Button approveButton = new Button("Approve");
+            approveButton.getStyleClass().add("primary-button");
+            approveButton.setOnAction(e -> handleApprove(ad));
+            actions.add(approveButton);
+
+            Button rejectButton = new Button("Reject");
+            rejectButton.getStyleClass().add("danger-button");
+            rejectButton.setOnAction(e -> handleReject(ad));
+            actions.add(rejectButton);
+
+            Button deleteButton = new Button("Delete");
+            deleteButton.getStyleClass().add("danger-button");
+            deleteButton.setOnAction(e -> handleDeletePending(ad));
+            actions.add(deleteButton);
+
+            pendingFlowPane.getChildren().add(
+                    UiComponents.buildAdCard(ad, true, actions, () -> openAdDetails(ad)));
         }
     }
 
@@ -77,15 +185,9 @@ public class AdminController {
         loadPendingAds();
     }
 
-    @FXML
-    private void handleApprove() {
-        Ad selected = pendingListView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            statusLabel.setText("Select an ad first.");
-            return;
-        }
+    private void handleApprove(Ad ad) {
         try {
-            ApiClient.approveAd(selected.getId());
+            ApiClient.approveAd(ad.getId());
             statusLabel.setText("Ad approved.");
             loadPendingAds();
         } catch (Exception e) {
@@ -94,25 +196,124 @@ public class AdminController {
         }
     }
 
-    @FXML
-    private void handleReject() {
-        Ad selected = pendingListView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            statusLabel.setText("Select an ad first.");
-            return;
-        }
-        String reason = reasonField.getText();
-        if (reason == null || reason.isBlank()) {
+    private void handleReject(Ad ad) {
+        Optional<String> reason = Dialogs.prompt("Reject Ad",
+                "Reject \"" + ad.getTitle() + "\"", "Rejection reason:");
+        if (reason.isEmpty() || reason.get().isBlank()) {
             statusLabel.setText("A rejection reason is required.");
             return;
         }
         try {
-            ApiClient.rejectAd(selected.getId(), reason);
+            ApiClient.rejectAd(ad.getId(), reason.get());
             statusLabel.setText("Ad rejected.");
-            reasonField.clear();
             loadPendingAds();
         } catch (Exception e) {
             statusLabel.setText("Could not reject ad: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void handleDeletePending(Ad ad) {
+        if (!Dialogs.confirm("Delete \"" + ad.getTitle() + "\"? This cannot be undone.")) {
+            return;
+        }
+        try {
+            ApiClient.deleteAd(ad.getId());
+            statusLabel.setText("Ad deleted.");
+            loadPendingAds();
+        } catch (Exception e) {
+            statusLabel.setText("Could not delete ad. The backend currently only lets an ad's own "
+                    + "seller delete it (needs an admin-delete permission): " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // All ads (browse / search / view details / delete)
+    // NOTE: there is no backend endpoint that returns every ad regardless of
+    // status, so this combines the public "approved" list with the admin
+    // "pending" list. Rejected, sold and deleted ads aren't retrievable by
+    // admins yet - that needs a new backend endpoint (e.g. GET /api/admin/ads).
+    // ---------------------------------------------------------------
+
+    private void loadAllAds() {
+        try {
+            Map<Long, Ad> byId = new LinkedHashMap<>();
+            for (Ad ad : ApiClient.getAds()) {
+                byId.put(ad.getId(), ad);
+            }
+            try {
+                for (Ad ad : ApiClient.getPendingAds()) {
+                    byId.put(ad.getId(), ad);
+                }
+            } catch (Exception ignored) {
+                // pending ads just won't be included in the combined list
+            }
+            allAdsCache = new ArrayList<>(byId.values());
+            applyAllAdsFilter();
+        } catch (Exception e) {
+            allAdsStatusLabel.setText("Could not load ads: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void applyAllAdsFilter() {
+        String keyword = allAdsSearchField.getText();
+        List<Ad> filtered = allAdsCache;
+        if (keyword != null && !keyword.isBlank()) {
+            String lower = keyword.toLowerCase();
+            filtered = allAdsCache.stream()
+                    .filter(ad -> (ad.getTitle() != null && ad.getTitle().toLowerCase().contains(lower))
+                            || (ad.getSellerUsername() != null && ad.getSellerUsername().toLowerCase().contains(lower)))
+                    .toList();
+        }
+        renderAllAds(filtered);
+        allAdsStatusLabel.setText(filtered.isEmpty()
+                ? "No ads match."
+                : "Showing approved + pending ads (" + filtered.size() + "). "
+                + "Rejected/sold/deleted ads aren't available to admins yet.");
+    }
+
+    private void renderAllAds(List<Ad> ads) {
+        allAdsFlowPane.getChildren().clear();
+        for (Ad ad : ads) {
+            List<Node> actions = new ArrayList<>();
+
+            Button viewButton = new Button("View Details");
+            viewButton.setOnAction(e -> openAdDetails(ad));
+            actions.add(viewButton);
+
+            Button deleteButton = new Button("Delete");
+            deleteButton.getStyleClass().add("danger-button");
+            deleteButton.setOnAction(e -> handleDeleteAllAdsAd(ad));
+            actions.add(deleteButton);
+
+            allAdsFlowPane.getChildren().add(
+                    UiComponents.buildAdCard(ad, true, actions, () -> openAdDetails(ad)));
+        }
+    }
+
+    @FXML
+    private void handleAllAdsSearch() {
+        applyAllAdsFilter();
+    }
+
+    @FXML
+    private void handleRefreshAllAds() {
+        loadAllAds();
+    }
+
+    private void handleDeleteAllAdsAd(Ad ad) {
+        if (!Dialogs.confirm("Delete \"" + ad.getTitle() + "\"? This cannot be undone.")) {
+            return;
+        }
+        try {
+            ApiClient.deleteAd(ad.getId());
+            allAdsStatusLabel.setText("Ad deleted.");
+            loadAllAds();
+        } catch (Exception e) {
+            allAdsStatusLabel.setText("Could not delete ad. The backend currently only lets an ad's own "
+                    + "seller delete it (needs an admin-delete permission): " + e.getMessage());
             e.printStackTrace();
         }
     }

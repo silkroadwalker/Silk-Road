@@ -90,6 +90,8 @@ public class HomeController {
 
     private void openAd(Ad ad) {
         SceneManager.setSelectedAd(ad);
+        SceneManager.setViewingAsAdmin(false);
+        SceneManager.setReturnScene("/fxml/home-view.fxml");
         SceneManager.switchScene("/fxml/ad-details-view.fxml");
     }
 
@@ -144,11 +146,6 @@ public class HomeController {
         loadAds();
     }
 
-    /**
-     * The backend doesn't support a sort parameter yet, so we sort the returned
-     * page client-side. Ads don't carry a createdAt field in the summary DTO, so
-     * "newest first" falls back to reverse-id order (higher id = created later).
-     */
     private List<Ad> applySort(List<Ad> ads) {
         String sort = sortBox.getValue();
         if (sort == null) return ads;

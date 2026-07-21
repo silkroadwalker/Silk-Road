@@ -82,6 +82,14 @@
     -fx-background-color: #F5D2C8;
 }
 
+.card-action-button {
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 600;
+    -fx-padding: 4px 8px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+}
+
 .icon-button {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 999px;
@@ -431,4 +439,30 @@
     -fx-font-size: 21px;
     -fx-font-weight: 800;
     -fx-text-fill: #2C3327;
+}
+
+.dashboard-chart {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 0 0 0;
+}
+
+.dashboard-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.dashboard-chart .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.dashboard-chart .chart-horizontal-grid-lines {
+    -fx-stroke: #E4E1D6;
+}
+
+.dashboard-chart .axis {
+    -fx-tick-label-fill: #6B7263;
+    -fx-font-size: 11.5px;
+}
+
+.dashboard-chart .default-color0.chart-bar {
+    -fx-bar-fill: #5C7A5E;
 }

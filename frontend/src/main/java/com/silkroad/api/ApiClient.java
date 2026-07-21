@@ -250,7 +250,7 @@ public class ApiClient {
         return out.toByteArray();
     }
 
-public static List<ChatSummary> getChats() throws Exception {
+    public static List<ChatSummary> getChats() throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/chat"))
                 .header("Authorization", "Bearer " + Session.getToken())
                 .GET()
@@ -434,6 +434,21 @@ public static List<ChatSummary> getChats() throws Exception {
         return gson.fromJson(response.body(), AdDetail.class);
     }
 
+    public static AdDetail getAdminAdDetails(Long adId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/admin/ads/" + adId))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Failed to load ad details: " + response.statusCode());
+        }
+
+        return gson.fromJson(response.body(), AdDetail.class);
+    }
+
     public static byte[] getImageBytes(String imageUrl) throws Exception {
         String path = imageUrl.startsWith("http") ? imageUrl.substring(imageUrl.indexOf("/api")) : imageUrl;
 
@@ -554,4 +569,3 @@ public static List<ChatSummary> getChats() throws Exception {
         }
     }
 }
-

@@ -4,13 +4,19 @@ import com.silkroad.api.ApiClient;
 import com.silkroad.model.Ad;
 import com.silkroad.model.AdDetail;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -31,32 +37,44 @@ public class AdDetailsController {
     @FXML private Button favoriteButton;
     @FXML private Button messageButton;
     @FXML private Button rateButton;
+    @FXML private HBox ownerActionsBox;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
+    @FXML private Button markSoldButton;
     @FXML private Label statusLabel;
 
     private AdDetail ad;
     private boolean isFavorite;
+    private boolean isAdminView;
 
     @FXML
     public void initialize() {
+        isAdminView = SceneManager.isViewingAsAdmin();
+        SceneManager.setViewingAsAdmin(false);
+
         Ad selected = SceneManager.getSelectedAd();
         if (selected == null) {
             statusLabel.setText("No ad selected.");
-            hideActions();
+            hideAllActions();
             return;
         }
 
         try {
-            ad = ApiClient.getAdDetails(selected.getId());
+            ad = isAdminView
+                    ? ApiClient.getAdminAdDetails(selected.getId())
+                    : ApiClient.getAdDetails(selected.getId());
         } catch (Exception e) {
             e.printStackTrace();
             statusLabel.setText("Could not load ad details: " + e.getMessage());
-            hideActions();
+            hideAllActions();
             return;
         }
 
         render();
         loadImages();
-        loadFavoriteState();
+        if (!ad.isSubmitter()) {
+            loadFavoriteState();
+        }
     }
 
     private void render() {
@@ -82,18 +100,37 @@ public class AdDetailsController {
         }
 
         if (ad.isSubmitter()) {
-            ownerNoteLabel.setText("This is your ad. Manage editing, deleting, or marking it sold from My Ads.");
-            hideActions();
+            // This is the logged-in user's own ad: swap the buyer-facing actions
+            // (favorite / message / rate) for owner-facing ones (edit / delete / mark sold).
+            ownerNoteLabel.setText("This is your ad.");
+
+            favoriteButton.setVisible(false);
+            favoriteButton.setManaged(false);
+            messageButton.setVisible(false);
+            messageButton.setManaged(false);
+            rateButton.setVisible(false);
+            rateButton.setManaged(false);
+
+            ownerActionsBox.setVisible(true);
+            ownerActionsBox.setManaged(true);
+            markSoldButton.setVisible(!"SOLD".equalsIgnoreCase(ad.getStatus()));
+            markSoldButton.setManaged(!"SOLD".equalsIgnoreCase(ad.getStatus()));
+        } else {
+            ownerNoteLabel.setText("");
+            ownerActionsBox.setVisible(false);
+            ownerActionsBox.setManaged(false);
         }
     }
 
-    private void hideActions() {
+    private void hideAllActions() {
         favoriteButton.setVisible(false);
         favoriteButton.setManaged(false);
         messageButton.setVisible(false);
         messageButton.setManaged(false);
         rateButton.setVisible(false);
         rateButton.setManaged(false);
+        ownerActionsBox.setVisible(false);
+        ownerActionsBox.setManaged(false);
     }
 
     private void loadImages() {
@@ -118,12 +155,39 @@ public class AdDetailsController {
                 clip.setArcWidth(14);
                 clip.setArcHeight(14);
                 view.setClip(clip);
+
+                // Click a thumbnail to see it full-size.
+                view.setCursor(Cursor.HAND);
+                view.setOnMouseClicked(e -> showFullImage(image));
+
                 imagesBox.getChildren().add(view);
             } catch (Exception e) {
                 e.printStackTrace();
                 // skip broken images rather than blocking the whole page
             }
         }
+    }
+
+    private void showFullImage(Image image) {
+        ImageView fullView = new ImageView(image);
+        fullView.setPreserveRatio(true);
+
+        double maxDim = 800;
+        if (image.getWidth() >= image.getHeight() && image.getWidth() > maxDim) {
+            fullView.setFitWidth(maxDim);
+        } else if (image.getHeight() > maxDim) {
+            fullView.setFitHeight(maxDim);
+        }
+
+        StackPane pane = new StackPane(fullView);
+        pane.setStyle("-fx-background-color: black;");
+        pane.setPadding(new Insets(16));
+
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setTitle(ad != null ? ad.getTitle() : "Photo");
+        popup.setScene(new Scene(pane));
+        popup.show();
     }
 
     private void loadFavoriteState() {
@@ -217,7 +281,46 @@ public class AdDetailsController {
     }
 
     @FXML
+    private void handleEditAd() {
+        SceneManager.setSelectedAd(ad);
+        SceneManager.switchScene("/fxml/edit-ad-view.fxml");
+    }
+
+    @FXML
+    private void handleDeleteAd() {
+        if (!Dialogs.confirm("Delete \"" + ad.getTitle() + "\"? This cannot be undone.")) {
+            return;
+        }
+        try {
+            ApiClient.deleteAd(ad.getId());
+            Dialogs.info("Ad deleted.");
+            SceneManager.switchScene("/fxml/my-ads-view.fxml");
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Could not delete ad: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleMarkSoldAd() {
+        if (!Dialogs.confirm("Mark \"" + ad.getTitle() + "\" as sold?")) {
+            return;
+        }
+        try {
+            ApiClient.markAdSold(ad.getId());
+            ad.setStatus("SOLD");
+            Dialogs.info("Marked as sold.");
+            render();
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Could not update status: " + e.getMessage());
+        }
+    }
+
+    @FXML
     private void goBack() {
-        SceneManager.switchScene("/fxml/home-view.fxml");
+        String target = SceneManager.getReturnScene();
+        SceneManager.setReturnScene("/fxml/home-view.fxml");
+        SceneManager.switchScene(target);
     }
 }

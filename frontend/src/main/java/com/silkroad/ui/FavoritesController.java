@@ -46,6 +46,8 @@ public class FavoritesController {
 
     private void openAd(Ad ad) {
         SceneManager.setSelectedAd(ad);
+        SceneManager.setViewingAsAdmin(false);
+        SceneManager.setReturnScene("/fxml/home-view.fxml");
         SceneManager.switchScene("/fxml/ad-details-view.fxml");
     }
 
