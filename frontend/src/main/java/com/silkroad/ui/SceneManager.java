@@ -12,6 +12,9 @@ public class SceneManager {
     private static Ad selectedAd;
     private static Long selectedChatId;
 
+    private static boolean viewingAsAdmin = false;
+    private static String returnScene = "/fxml/home-view.fxml";
+
 
     public static void setStage(Stage stage) {
         primaryStage = stage;
@@ -42,5 +45,21 @@ public class SceneManager {
 
     public static Long getSelectedChatId() {
         return selectedChatId;
+    }
+
+    public static void setViewingAsAdmin(boolean value) {
+        viewingAsAdmin = value;
+    }
+
+    public static boolean isViewingAsAdmin() {
+        return viewingAsAdmin;
+    }
+
+    public static void setReturnScene(String fxmlPath) {
+        returnScene = fxmlPath;
+    }
+
+    public static String getReturnScene() {
+        return returnScene;
     }
 }

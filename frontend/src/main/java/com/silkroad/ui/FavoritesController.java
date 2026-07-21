@@ -9,6 +9,10 @@ import javafx.scene.layout.FlowPane;
 
 import java.util.List;
 
+/**
+ * controller for the favorites view. displays the current user's list of
+ * favorited ads as clickable cards, and provides a remove button for each.
+ */
 public class FavoritesController {
 
     @FXML
@@ -21,6 +25,10 @@ public class FavoritesController {
         loadFavorites();
     }
 
+    /**
+     * fetches the user's favorite ads from the backend and renders them
+     * as cards. shows a message if the list is empty or if an error occurs.
+     */
     private void loadFavorites() {
         try {
             List<Ad> favorites = ApiClient.getFavorites();
@@ -32,6 +40,12 @@ public class FavoritesController {
         }
     }
 
+    /**
+     * builds a card for each favorite ad with a remove button.
+     * clicking the card opens the ad detail view.
+     *
+     * @param favorites the list of favorited ads to display
+     */
     private void renderFavorites(List<Ad> favorites) {
         favoritesFlowPane.getChildren().clear();
         for (Ad ad : favorites) {
@@ -46,6 +60,8 @@ public class FavoritesController {
 
     private void openAd(Ad ad) {
         SceneManager.setSelectedAd(ad);
+        SceneManager.setViewingAsAdmin(false);
+        SceneManager.setReturnScene("/fxml/home-view.fxml");
         SceneManager.switchScene("/fxml/ad-details-view.fxml");
     }
 

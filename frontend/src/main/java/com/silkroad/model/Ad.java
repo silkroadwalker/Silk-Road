@@ -39,7 +39,6 @@ public class Ad {
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     public void setThumbnailUrl(String thumbnailUrl) { this.thumbnailUrl = thumbnailUrl; }
 
-    // city may not be added yet
     @Override
     public String toString() {
         return title + " - " + price + " (" + city + ")";

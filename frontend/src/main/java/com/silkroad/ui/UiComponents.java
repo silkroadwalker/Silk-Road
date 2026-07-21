@@ -3,12 +3,13 @@ package com.silkroad.ui;
 import com.silkroad.api.ApiClient;
 import com.silkroad.model.Ad;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
@@ -18,9 +19,11 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 /**
- * Small reusable UI building blocks shared by Home, Favorites, My Ads,
- * Conversations, and Ad Details, so the same "ad card" / "avatar" / "status
- * chip" looks and behaves identically everywhere it shows up.
+ * Utility methods for creating reusable JavaFX user interface components.
+ * <p>
+ * This class centralizes the construction of common visual elements such as
+ * advertisement cards, status badges, and user avatars to ensure a consistent
+ * appearance across the application.
  */
 public final class UiComponents {
 
@@ -81,10 +84,16 @@ public final class UiComponents {
         card.setPadding(new Insets(0, 0, 12, 0));
 
         if (actionRow != null && !actionRow.isEmpty()) {
-            HBox actions = new HBox(6);
-            actions.setAlignment(Pos.CENTER_LEFT);
+            FlowPane actions = new FlowPane(6, 6);
             actions.setPadding(new Insets(10, 12, 0, 12));
-            actions.getChildren().addAll(actionRow);
+            actions.setPrefWrapLength(CARD_WIDTH - 24);
+            actions.setMaxWidth(CARD_WIDTH - 24);
+            for (Node node : actionRow) {
+                if (node instanceof Button) {
+                    node.getStyleClass().add("card-action-button");
+                }
+                actions.getChildren().add(node);
+            }
             card.getChildren().add(actions);
         }
 
@@ -102,7 +111,32 @@ public final class UiComponents {
         }
         try {
             byte[] bytes = ApiClient.getImageBytes(url);
-            ImageView view = new ImageView(new Image(new ByteArrayInputStream(bytes)));
+            Image image = new Image(new ByteArrayInputStream(bytes));
+            ImageView view = new ImageView(image);
+
+            double srcW = image.getWidth();
+            double srcH = image.getHeight();
+            double boxRatio = CARD_WIDTH / IMAGE_HEIGHT;
+
+            if (srcW > 0 && srcH > 0) {
+                double srcRatio = srcW / srcH;
+                double cropW, cropH, cropX, cropY;
+                if (srcRatio > boxRatio) {
+                    // source is relatively wider than the box -> crop the sides
+                    cropH = srcH;
+                    cropW = srcH * boxRatio;
+                    cropX = (srcW - cropW) / 2;
+                    cropY = 0;
+                } else {
+                    // source is relatively taller than the box -> crop top/bottom
+                    cropW = srcW;
+                    cropH = srcW / boxRatio;
+                    cropX = 0;
+                    cropY = (srcH - cropH) / 2;
+                }
+                view.setViewport(new Rectangle2D(cropX, cropY, cropW, cropH));
+            }
+
             view.setFitWidth(CARD_WIDTH);
             view.setFitHeight(IMAGE_HEIGHT);
             view.setPreserveRatio(false);
@@ -119,6 +153,16 @@ public final class UiComponents {
         }
     }
 
+    /**
+     * Creates a status badge representing the current state of an advertisement.
+     * <p>
+     * The returned label is styled according to the advertisement status and can
+     * be displayed within ad cards or detail views. Supported statuses include
+     * Pending, Approved, Rejected, and Sold.
+     *
+     * @param status the advertisement status
+     * @return a styled status label, or {@code null} if the status is unknown
+     */
     public static Label statusChip(String status) {
         if (status == null || status.isBlank()) {
             return null;
@@ -144,7 +188,16 @@ public final class UiComponents {
         return chip;
     }
 
-    /** Small circular avatar with the first letter of a name/username. */
+    /**
+     * Creates a circular avatar displaying the first letter of a user's name.
+     * <p>
+     * When no valid name is provided, a question mark is displayed instead.
+     * The avatar is intended for use in chat, profile, and user-related views.
+     *
+     * @param name the name from which the avatar initial is derived
+     * @param size the width and height of the avatar in pixels
+     * @return a stack pane containing the avatar graphics
+     */
     public static StackPane avatar(String name, double size) {
         Circle circle = new Circle(size / 2.0);
         circle.getStyleClass().add("avatar-circle");

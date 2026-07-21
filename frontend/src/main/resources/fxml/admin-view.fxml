@@ -2,6 +2,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.silkroad.ui.AdminController"
@@ -18,24 +21,80 @@
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE">
 
-            <Tab text="Pending Ads">
+            <Tab text="Dashboard">
                 <BorderPane styleClass="page-body">
                     <center>
-                        <ListView fx:id="pendingListView" BorderPane.alignment="CENTER">
-                            <BorderPane.margin><Insets top="12" right="12" bottom="0" left="12"/></BorderPane.margin>
-                        </ListView>
+                        <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER" styleClass="ads-grid-scroll">
+                            <VBox spacing="12">
+                                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+                                <Label text="Overview" styleClass="section-title"/>
+                                <Label fx:id="totalUsersLabel" styleClass="detail-title"/>
+                                <Label fx:id="pendingAdsCountLabel" styleClass="detail-title"/>
+                                <Label fx:id="activeAdsCountLabel" styleClass="detail-title"/>
+                                <Button text="Refresh" onAction="#handleRefreshDashboard"/>
+                                <BarChart fx:id="dashboardChart" styleClass="dashboard-chart" legendVisible="false"
+                                          animated="false" categoryGap="60" barGap="4"
+                                          prefHeight="280" VBox.vgrow="NEVER">
+                                    <xAxis>
+                                        <CategoryAxis label="Metric" side="BOTTOM"/>
+                                    </xAxis>
+                                    <yAxis>
+                                        <NumberAxis label="Count" side="LEFT"/>
+                                    </yAxis>
+                                </BarChart>
+                                <Label fx:id="dashboardNoteLabel" styleClass="empty-state" wrapText="true"/>
+                            </VBox>
+                        </ScrollPane>
+                    </center>
+                </BorderPane>
+            </Tab>
+
+            <Tab text="Pending Ads">
+                <BorderPane styleClass="page-body">
+                    <top>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <padding><Insets top="12" right="12" bottom="0" left="12"/></padding>
+                            <Button text="Refresh" onAction="#handleRefreshPending"/>
+                        </HBox>
+                    </top>
+                    <center>
+                        <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER" styleClass="ads-grid-scroll">
+                            <VBox>
+                                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                                <FlowPane fx:id="pendingFlowPane" hgap="16" vgap="16"/>
+                            </VBox>
+                        </ScrollPane>
+                    </center>
+                    <bottom>
+                        <Label fx:id="statusLabel" styleClass="empty-state" wrapText="true">
+                            <padding><Insets top="0" right="12" bottom="12" left="12"/></padding>
+                        </Label>
+                    </bottom>
+                </BorderPane>
+            </Tab>
+
+            <Tab text="All Ads">
+                <BorderPane styleClass="page-body">
+                    <top>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <padding><Insets top="12" right="12" bottom="0" left="12"/></padding>
+                            <TextField fx:id="allAdsSearchField" promptText="Search by title or seller" HBox.hgrow="ALWAYS"/>
+                            <Button text="Search" onAction="#handleAllAdsSearch" styleClass="primary-button"/>
+                        </HBox>
+                    </top>
+                    <center>
+                        <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER" styleClass="ads-grid-scroll">
+                            <VBox>
+                                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                                <FlowPane fx:id="allAdsFlowPane" hgap="16" vgap="16"/>
+                            </VBox>
+                        </ScrollPane>
                     </center>
                     <bottom>
                         <VBox spacing="8">
                             <padding><Insets top="10" right="12" bottom="12" left="12"/></padding>
-                            <Label text="Rejection reason (required to reject):" styleClass="field-label"/>
-                            <TextArea fx:id="reasonField" prefRowCount="2" wrapText="true"/>
-                            <HBox spacing="10">
-                                <Button text="Approve" onAction="#handleApprove" styleClass="primary-button"/>
-                                <Button text="Reject" onAction="#handleReject" styleClass="danger-button"/>
-                                <Button text="Refresh" onAction="#handleRefreshPending"/>
-                            </HBox>
-                            <Label fx:id="statusLabel" styleClass="empty-state"/>
+                            <Button text="Refresh" onAction="#handleRefreshAllAds"/>
+                            <Label fx:id="allAdsStatusLabel" styleClass="empty-state" wrapText="true"/>
                         </VBox>
                     </bottom>
                 </BorderPane>
