@@ -63,7 +63,6 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        checkResponse(response, "login");
         return parseAuthResponse(response);
     }
 
