@@ -36,6 +36,8 @@ public class CreateAdController {
     @FXML
     private ComboBox<City> cityComboBox;
     @FXML
+    private ComboBox<Category> subCategoryComboBox;
+    @FXML
     private ListView<String> imagesListView;
     @FXML
     private Label statusLabel;
@@ -51,6 +53,8 @@ public class CreateAdController {
         loadCategories();
         loadCities();
         imagesListView.setItems(FXCollections.observableArrayList());
+
+        categoryComboBox.valueProperty().addListener((obs, oldVal, newVal) -> loadSubcategories(newVal));
     }
 
     private void loadCategories() {
@@ -60,6 +64,25 @@ public class CreateAdController {
         } catch (Exception e) {
             e.printStackTrace();
             statusLabel.setText("Could not load categories: " + e.getMessage());
+        }
+    }
+
+    private void loadSubcategories(Category parent) {
+        subCategoryComboBox.getItems().clear();
+        subCategoryComboBox.setValue(null);
+
+        if (parent == null || !parent.isHasChildren()) {
+            subCategoryComboBox.setDisable(true);
+            return;
+        }
+
+        try {
+            List<Category> subcategories = ApiClient.getSubcategories(parent.getId());
+            subCategoryComboBox.setItems(FXCollections.observableArrayList(subcategories));
+            subCategoryComboBox.setDisable(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Could not load subcategories: " + e.getMessage());
         }
     }
 
@@ -108,6 +131,7 @@ public class CreateAdController {
         String description = descriptionField.getText();
         String priceText = priceField.getText();
         Category selectedCategory = categoryComboBox.getValue();
+        Category selectedSubCategory = subCategoryComboBox.getValue();
         City selectedCity = cityComboBox.getValue();
 
         if (isBlank(title) || isBlank(description) || isBlank(priceText)) {
@@ -119,6 +143,13 @@ public class CreateAdController {
             showError("Please select a category.");
             return;
         }
+
+        if (selectedCategory.isHasChildren() && selectedSubCategory == null) {
+            showError("Please select a subcategory.");
+            return;
+        }
+
+        Category categoryForAd = selectedSubCategory != null ? selectedSubCategory : selectedCategory;
 
         if (selectedCity == null) {
             showError("Please select a city.");

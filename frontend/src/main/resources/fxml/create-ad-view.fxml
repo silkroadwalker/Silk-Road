@@ -48,6 +48,10 @@
                   <VBox spacing="6" HBox.hgrow="ALWAYS">
                      <Label text="Category" styleClass="field-label"/>
                      <ComboBox fx:id="categoryComboBox" promptText="Category" maxWidth="Infinity"/>
+                     <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="Subcategory" styleClass="field-label"/>
+                        <ComboBox fx:id="subCategoryComboBox" promptText="Subcategory" maxWidth="Infinity" disable="true"/>
+                     </VBox>
                   </VBox>
                </HBox>
 
