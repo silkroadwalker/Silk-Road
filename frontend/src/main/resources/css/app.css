@@ -803,12 +803,12 @@
    Scoped under ".home-page" so no other screen is affected.
    ===================================================================== */
 
-.home-page {
-    -fx-background-color: #F7F6F0;
+.page-body.home-page {
+    -fx-background-color: #fcfce1;
 }
 
-.home-page .home-top-bar {
-    -fx-background-color: linear-gradient(to right, #EAF6EE 0%, #FFF7E8 55%, #FDEEE9 100%);
+.home-page.home-top-bar {
+    -fx-background-color: transparent;
     -fx-border-color: transparent transparent #E4E1D6 transparent;
     -fx-border-width: 0 0 1 0;
 }
