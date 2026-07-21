@@ -18,18 +18,34 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * controller for the create ad view. handles form input, image selection,
+ * category and city dropdowns, and submission of a new ad to the backend.
+ */
 public class CreateAdController {
-    @FXML private Label headerLabel;
-    @FXML private TextField titleField;
-    @FXML private TextArea descriptionField;
-    @FXML private TextField priceField;
-    @FXML private ComboBox<Category> categoryComboBox;
-    @FXML private ComboBox<City> cityComboBox;
-    @FXML private ListView<String> imagesListView;
-    @FXML private Label statusLabel;
+    @FXML
+    private Label headerLabel;
+    @FXML
+    private TextField titleField;
+    @FXML
+    private TextArea descriptionField;
+    @FXML
+    private TextField priceField;
+    @FXML
+    private ComboBox<Category> categoryComboBox;
+    @FXML
+    private ComboBox<City> cityComboBox;
+    @FXML
+    private ListView<String> imagesListView;
+    @FXML
+    private Label statusLabel;
 
     private final List<Path> selectedImages = new ArrayList<>();
 
+    /**
+     * called by javafx after fxml loading. populates the category and city
+     * dropdowns from the server and prepares the image list view.
+     */
     @FXML
     public void initialize() {
         loadCategories();
@@ -57,6 +73,11 @@ public class CreateAdController {
         }
     }
 
+    /**
+     * opens a file chooser dialog that allows the user to select multiple
+     * image files. the selected files are added to the list view and stored
+     * for submission along with the ad data.
+     */
     @FXML
     private void handleChooseImages() {
         FileChooser chooser = new FileChooser();
@@ -74,6 +95,13 @@ public class CreateAdController {
         }
     }
 
+    /**
+     * validates all form fields (title, description, price, category, city)
+     * and submits the ad creation request to the backend. on success, the
+     * user is informed that the ad will be reviewed by an admin and then
+     * navigated back to the home view. validation errors are displayed
+     * on the status label.
+     */
     @FXML
     private void handleSubmit() {
         String title = titleField.getText();

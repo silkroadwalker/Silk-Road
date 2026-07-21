@@ -18,18 +18,32 @@ import javafx.scene.layout.VBox;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * controller for the chat detail view. displays all messages of a conversation,
+ * distinguishes between own and other user's messages with bubble styling,
+ * and allows the user to reply.
+ */
 public class ChatDetailController {
 
-    @FXML private Label adTitleLabel;
-    @FXML private ScrollPane messagesScroll;
-    @FXML private VBox messagesBox;
-    @FXML private TextField messageField;
-    @FXML private Label statusLabel;
+    @FXML
+    private Label adTitleLabel;
+    @FXML
+    private ScrollPane messagesScroll;
+    @FXML
+    private VBox messagesBox;
+    @FXML
+    private TextField messageField;
+    @FXML
+    private Label statusLabel;
 
     private Long chatId;
 
     private static final double BUBBLE_MAX_WIDTH = 420;
 
+    /**
+     * called by javafx after fxml loading. retrieves the selected chat id
+     * from the scene manager and triggers the conversation load.
+     */
     @FXML
     public void initialize() {
         chatId = SceneManager.getSelectedChatId();
@@ -42,6 +56,11 @@ public class ChatDetailController {
         loadChat();
     }
 
+    /**
+     * fetches the complete conversation from the server and renders
+     * all messages in the chat bubble view. shows an error if the
+     * request fails.
+     */
     private void loadChat() {
         try {
             ChatDetail detail = ApiClient.getChat(chatId);
@@ -53,6 +72,13 @@ public class ChatDetailController {
         }
     }
 
+    /**
+     * clears the message container and builds a message bubble row
+     * for every message in the conversation. the scroll pane is then
+     * scrolled to the bottom.
+     *
+     * @param detail the chat detail containing the message list
+     */
     private void renderMessages(ChatDetail detail) {
         messagesBox.getChildren().clear();
 
@@ -108,6 +134,10 @@ public class ChatDetailController {
         }
     }
 
+    /**
+     * sends the entered message to the server and reloads the conversation
+     * to display the new message.
+     */
     @FXML
     private void handleSend() {
         String text = messageField.getText();
@@ -126,6 +156,9 @@ public class ChatDetailController {
         }
     }
 
+    /**
+     * returns to the conversation list view.
+     */
     @FXML
     private void goBack() {
         SceneManager.switchScene("/fxml/conversations-view.fxml");

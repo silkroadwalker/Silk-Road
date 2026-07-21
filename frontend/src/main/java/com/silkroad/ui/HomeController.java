@@ -12,6 +12,11 @@ import javafx.scene.layout.FlowPane;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * main controller for the home view. displays the list of active ads,
+ * provides search and filter functionality, and serves as the primary
+ * navigation hub for regular users and admins.
+ */
 public class HomeController {
     @FXML
     private Label welcomeLabel;
@@ -38,6 +43,11 @@ public class HomeController {
     private static final String SORT_CHEAPEST = "Cheapest first";
     private static final String SORT_EXPENSIVE = "Most expensive first";
 
+    /**
+     * called by javafx after fxml loading. sets up the welcome message,
+     * shows the admin button if applicable, loads filter dropdowns,
+     * and fetches the initial list of ads.
+     */
     @FXML
     public void initialize() {
         welcomeLabel.setText("Welcome, " + Session.getUsername() + "!");
@@ -69,6 +79,10 @@ public class HomeController {
         }
     }
 
+    /**
+     * fetches all active ads from the backend and displays them as cards.
+     * shows an error message if the request fails.
+     */
     private void loadAds() {
         try {
             List<Ad> ads = ApiClient.getAds();
@@ -95,6 +109,11 @@ public class HomeController {
         SceneManager.switchScene("/fxml/ad-details-view.fxml");
     }
 
+    /**
+     * executes a search with the current filter values (keyword, category,
+     * city, price range, and sort order). displays matching ads or a message
+     * if no results are found. validation errors are shown on the status label.
+     */
     @FXML
     private void handleSearch() {
         ApiClient.AdFilter filter = new ApiClient.AdFilter();
@@ -135,6 +154,10 @@ public class HomeController {
         }
     }
 
+    /**
+     * resets all filter fields (search text, category, city, price range,
+     * and sort order) and reloads the full list of ads.
+     */
     @FXML
     private void handleClearFilters() {
         searchField.clear();

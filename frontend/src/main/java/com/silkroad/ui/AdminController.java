@@ -17,34 +17,53 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * controller for the admin panel. provides tabs for a dashboard,
+ * pending ads, browsing all ads, managing categories, and
+ * blocking/unblocking users.
+ */
 public class AdminController {
 
-    // --- Dashboard tab ---
-    @FXML private Label totalUsersLabel;
-    @FXML private Label pendingAdsCountLabel;
-    @FXML private Label activeAdsCountLabel;
-    @FXML private Label dashboardNoteLabel;
-    @FXML private BarChart<String, Number> dashboardChart;
+    @FXML
+    private Label totalUsersLabel;
+    @FXML
+    private Label pendingAdsCountLabel;
+    @FXML
+    private Label activeAdsCountLabel;
+    @FXML
+    private Label dashboardNoteLabel;
+    @FXML
+    private BarChart<String, Number> dashboardChart;
 
-    // --- Pending ads tab ---
-    @FXML private FlowPane pendingFlowPane;
-    @FXML private Label statusLabel;
+    @FXML
+    private FlowPane pendingFlowPane;
+    @FXML
+    private Label statusLabel;
 
-    // --- All ads tab ---
-    @FXML private TextField allAdsSearchField;
-    @FXML private FlowPane allAdsFlowPane;
-    @FXML private Label allAdsStatusLabel;
+    @FXML
+    private TextField allAdsSearchField;
+    @FXML
+    private FlowPane allAdsFlowPane;
+    @FXML
+    private Label allAdsStatusLabel;
     private List<Ad> allAdsCache = new ArrayList<>();
 
-    // --- Categories tab ---
-    @FXML private ListView<Category> categoriesListView;
-    @FXML private TextField categoryNameField;
-    @FXML private Label categoryStatusLabel;
+    @FXML
+    private ListView<Category> categoriesListView;
+    @FXML
+    private TextField categoryNameField;
+    @FXML
+    private Label categoryStatusLabel;
 
-    // --- Users tab ---
-    @FXML private ListView<ApiClient.AdminUser> usersListView;
-    @FXML private Label usersStatusLabel;
+    @FXML
+    private ListView<ApiClient.AdminUser> usersListView;
+    @FXML
+    private Label usersStatusLabel;
 
+    /**
+     * called by javafx after fxml loading. initialises all admin tabs
+     * by loading pending ads, all ads, categories, users, and the dashboard.
+     */
     @FXML
     public void initialize() {
         loadPendingAds();
@@ -72,6 +91,11 @@ public class AdminController {
         loadDashboard();
     }
 
+    /**
+     * opens the ad detail view in admin mode, so the admin can inspect
+     * any ad regardless of its status. sets the return scene so that
+     * the back button returns to the admin panel.
+     */
     private void openAdDetails(Ad ad) {
         SceneManager.setSelectedAd(ad);
         SceneManager.setViewingAsAdmin(true);
@@ -80,9 +104,14 @@ public class AdminController {
     }
 
     // ---------------------------------------------------------------
-    // Dashboard
+    // dashboard
     // ---------------------------------------------------------------
 
+    /**
+     * fetches user, pending, and active ad counts from the backend
+     * and updates the dashboard labels and bar chart. shows a note
+     * if any of the required endpoints are unavailable.
+     */
     private void loadDashboard() {
         StringBuilder note = new StringBuilder();
 
@@ -121,6 +150,13 @@ public class AdminController {
         renderDashboardChart(totalUsers, pendingCount, activeCount);
     }
 
+    /**
+     * populates the bar chart with the retrieved statistics.
+     *
+     * @param totalUsers   number of registered users
+     * @param pendingCount number of pending ads
+     * @param activeCount  number of active ads
+     */
     private void renderDashboardChart(int totalUsers, int pendingCount, int activeCount) {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.getData().add(new XYChart.Data<>("Users", Math.max(totalUsers, 0)));
@@ -137,7 +173,7 @@ public class AdminController {
     }
 
     // ---------------------------------------------------------------
-    // Pending ads
+    // pending ads
     // ---------------------------------------------------------------
 
     private void loadPendingAds() {
@@ -151,6 +187,11 @@ public class AdminController {
         }
     }
 
+    /**
+     * builds a card for each pending ad with view, approve, reject, and delete buttons.
+     *
+     * @param ads the list of pending ads
+     */
     private void renderPendingAds(List<Ad> ads) {
         pendingFlowPane.getChildren().clear();
         for (Ad ad : ads) {
@@ -185,6 +226,11 @@ public class AdminController {
         loadPendingAds();
     }
 
+    /**
+     * approves the given ad, changing its status to active.
+     *
+     * @param ad the ad to approve
+     */
     private void handleApprove(Ad ad) {
         try {
             ApiClient.approveAd(ad.getId());
@@ -196,6 +242,11 @@ public class AdminController {
         }
     }
 
+    /**
+     * rejects the given ad and requires the admin to provide a rejection reason.
+     *
+     * @param ad the ad to reject
+     */
     private void handleReject(Ad ad) {
         Optional<String> reason = Dialogs.prompt("Reject Ad",
                 "Reject \"" + ad.getTitle() + "\"", "Rejection reason:");
@@ -213,6 +264,11 @@ public class AdminController {
         }
     }
 
+    /**
+     * deletes a pending ad immediately (admin-only action).
+     *
+     * @param ad the ad to delete
+     */
     private void handleDeletePending(Ad ad) {
         if (!Dialogs.confirm("Delete \"" + ad.getTitle() + "\"? This cannot be undone.")) {
             return;
@@ -228,14 +284,11 @@ public class AdminController {
         }
     }
 
-    // ---------------------------------------------------------------
-    // All ads (browse / search / view details / delete)
-    // NOTE: there is no backend endpoint that returns every ad regardless of
-    // status, so this combines the public "approved" list with the admin
-    // "pending" list. Rejected, sold and deleted ads aren't retrievable by
-    // admins yet - that needs a new backend endpoint (e.g. GET /api/admin/ads).
-    // ---------------------------------------------------------------
-
+    /**
+     * loads active ads and pending ads into a single cache for admin browsing.
+     * rejected, sold, and deleted ads are not yet retrievable because the
+     * backend does not expose an admin endpoint for them.
+     */
     private void loadAllAds() {
         try {
             Map<Long, Ad> byId = new LinkedHashMap<>();
@@ -257,6 +310,10 @@ public class AdminController {
         }
     }
 
+    /**
+     * filters the cached ads by the search keyword and renders the result.
+     * search is performed on both title and seller username.
+     */
     private void applyAllAdsFilter() {
         String keyword = allAdsSearchField.getText();
         List<Ad> filtered = allAdsCache;
@@ -303,6 +360,11 @@ public class AdminController {
         loadAllAds();
     }
 
+    /**
+     * deletes an ad from the 'all ads' view after confirmation.
+     *
+     * @param ad the ad to delete
+     */
     private void handleDeleteAllAdsAd(Ad ad) {
         if (!Dialogs.confirm("Delete \"" + ad.getTitle() + "\"? This cannot be undone.")) {
             return;
@@ -319,7 +381,7 @@ public class AdminController {
     }
 
     // ---------------------------------------------------------------
-    // Categories
+    // categories
     // ---------------------------------------------------------------
 
     private void loadCategories() {
@@ -393,14 +455,6 @@ public class AdminController {
             e.printStackTrace();
         }
     }
-
-    // ---------------------------------------------------------------
-    // Users (block/unblock)
-    // NOTE: the backend has no user-management endpoints yet (no UserController).
-    // The User entity already has a UserStatus field, so this just needs the
-    // backend teammate to expose GET /api/admin/users, PATCH .../block and
-    // PATCH .../unblock. Until then these calls will show a clear error here.
-    // ---------------------------------------------------------------
 
     private void loadUsers() {
         try {

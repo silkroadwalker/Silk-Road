@@ -14,6 +14,11 @@ import javafx.scene.control.TextField;
 
 import java.util.List;
 
+/**
+ * controller for the edit ad view. loads the selected ad's current data
+ * into the form, allows the user to modify title, description, price,
+ * category, and city, and submits the changes to the backend.
+ */
 public class EditAdController {
 
     @FXML private TextField titleField;
@@ -25,6 +30,11 @@ public class EditAdController {
 
     private Ad editingAd;
 
+    /**
+     * called by javafx after fxml loading. retrieves the selected ad from
+     * the scene manager, populates category and city dropdowns, and fills
+     * the form fields with the ad's current data.
+     */
     @FXML
     public void initialize() {
         editingAd = SceneManager.getSelectedAd();
@@ -58,10 +68,6 @@ public class EditAdController {
         selectByName(categoryComboBox, editingAd.getCategory());
         selectByName(cityComboBox, editingAd.getCity());
 
-        /* GET /api/ads/{id} only returns APPROVED ads, so this will fail for
-         pending/rejected/sold ads owned by the user (a backend gap — the
-         isSubmitter check exists server-side but isn't actually used to bypass
-         the status requirement). We fall back to what the summary already gave us. */
         try {
             AdDetail detail = ApiClient.getAdDetails(editingAd.getId());
             descriptionField.setText(detail.getDescription());
@@ -83,6 +89,11 @@ public class EditAdController {
         }
     }
 
+    /**
+     * validates the form inputs and submits the updated ad data to the
+     * backend. on success, the user is notified and returned to the my ads
+     * view. validation errors are displayed on the status label.
+     */
     @FXML
     private void handleSave() {
         String title = titleField.getText();

@@ -15,6 +15,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * controller for the conversation list view. displays all active chats
+ * for the current user, showing the other participant, ad title, last
+ * message preview, and timestamp. clicking a row opens the detailed
+ * chat view.
+ */
 public class ConversationsController {
 
     @FXML
@@ -22,11 +28,19 @@ public class ConversationsController {
     @FXML
     private Label statusLabel;
 
+    /**
+     * called by javafx after fxml loading. loads and displays the
+     * user's conversation list.
+     */
     @FXML
     public void initialize() {
         loadConversations();
     }
 
+    /**
+     * fetches all conversations from the backend and renders them
+     * as clickable rows. shows an error message if the request fails.
+     */
     private void loadConversations() {
         try {
             List<ChatSummary> chats = ApiClient.getChats();
@@ -38,6 +52,12 @@ public class ConversationsController {
         }
     }
 
+    /**
+     * builds a visual row for each conversation and adds it to the container.
+     * clicking a row navigates to the detailed chat view for that conversation.
+     *
+     * @param chats the list of chat summaries to display
+     */
     private void renderConversations(List<ChatSummary> chats) {
         conversationsBox.getChildren().clear();
         for (ChatSummary chat : chats) {

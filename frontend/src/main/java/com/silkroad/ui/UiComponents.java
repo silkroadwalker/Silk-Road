@@ -18,6 +18,13 @@ import javafx.scene.shape.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
+/**
+ * Utility methods for creating reusable JavaFX user interface components.
+ * <p>
+ * This class centralizes the construction of common visual elements such as
+ * advertisement cards, status badges, and user avatars to ensure a consistent
+ * appearance across the application.
+ */
 public final class UiComponents {
 
     public static final double CARD_WIDTH = 210;
@@ -146,6 +153,16 @@ public final class UiComponents {
         }
     }
 
+    /**
+     * Creates a status badge representing the current state of an advertisement.
+     * <p>
+     * The returned label is styled according to the advertisement status and can
+     * be displayed within ad cards or detail views. Supported statuses include
+     * Pending, Approved, Rejected, and Sold.
+     *
+     * @param status the advertisement status
+     * @return a styled status label, or {@code null} if the status is unknown
+     */
     public static Label statusChip(String status) {
         if (status == null || status.isBlank()) {
             return null;
@@ -171,6 +188,16 @@ public final class UiComponents {
         return chip;
     }
 
+    /**
+     * Creates a circular avatar displaying the first letter of a user's name.
+     * <p>
+     * When no valid name is provided, a question mark is displayed instead.
+     * The avatar is intended for use in chat, profile, and user-related views.
+     *
+     * @param name the name from which the avatar initial is derived
+     * @param size the width and height of the avatar in pixels
+     * @return a stack pane containing the avatar graphics
+     */
     public static StackPane avatar(String name, double size) {
         Circle circle = new Circle(size / 2.0);
         circle.getStyleClass().add("avatar-circle");

@@ -22,6 +22,12 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * controller for the ad detail view. shows full ad information,
+ * handles image display, favorite toggling, messaging the seller,
+ * rating, and owner-specific actions (edit/delete/mark sold).
+ * also supports an admin view mode for inspecting any ad.
+ */
 public class AdDetailsController {
 
     @FXML private HBox imagesBox;
@@ -47,6 +53,12 @@ public class AdDetailsController {
     private boolean isFavorite;
     private boolean isAdminView;
 
+    /**
+     * called by javafx after fxml loading. resolves whether the user is
+     * viewing as admin, fetches the appropriate ad detail, and renders
+     * the ui. if the current user owns the ad, the owner action buttons
+     * are shown instead of buyer actions.
+     */
     @FXML
     public void initialize() {
         isAdminView = SceneManager.isViewingAsAdmin();
@@ -77,6 +89,11 @@ public class AdDetailsController {
         }
     }
 
+    /**
+     * populates all ui labels with ad data and switches between
+     * buyer-facing actions and owner-facing actions based on the
+     * submitter flag.
+     */
     private void render() {
         titleLabel.setText(ad.getTitle());
         priceLabel.setText("$" + ad.getPrice());
@@ -133,6 +150,11 @@ public class AdDetailsController {
         ownerActionsBox.setManaged(false);
     }
 
+    /**
+     * loads images from the server and displays them as thumbnails.
+     * clicking a thumbnail opens a full-size popup. broken images are
+     * skipped silently to avoid blocking the rest of the page.
+     */
     private void loadImages() {
         List<String> urls = ad.getImageUrls();
         if (urls == null || urls.isEmpty()) {
@@ -200,6 +222,9 @@ public class AdDetailsController {
         }
     }
 
+    /**
+     * adds or removes the current ad from the user's favorite list.
+     */
     @FXML
     private void handleToggleFavorite() {
         try {
@@ -216,6 +241,9 @@ public class AdDetailsController {
         }
     }
 
+    /**
+     * opens a dialog for the user to send an initial message to the seller.
+     */
     @FXML
     private void handleMessageSeller() {
         TextInputDialog dialog = new TextInputDialog();
@@ -237,6 +265,10 @@ public class AdDetailsController {
         }
     }
 
+    /**
+     * opens a dialog to submit a numeric rating (1-5) and an optional comment
+     * for the seller of this ad.
+     */
     @FXML
     private void handleRateSeller() {
         TextInputDialog scoreDialog = new TextInputDialog();
@@ -280,12 +312,18 @@ public class AdDetailsController {
         }
     }
 
+    /**
+     * navigates to the edit ad view for the current ad (owner only).
+     */
     @FXML
     private void handleEditAd() {
         SceneManager.setSelectedAd(ad);
         SceneManager.switchScene("/fxml/edit-ad-view.fxml");
     }
 
+    /**
+     * deletes the current ad after confirmation (owner or admin only).
+     */
     @FXML
     private void handleDeleteAd() {
         if (!Dialogs.confirm("Delete \"" + ad.getTitle() + "\"? This cannot be undone.")) {
@@ -301,6 +339,9 @@ public class AdDetailsController {
         }
     }
 
+    /**
+     * marks the current ad as sold after confirmation (owner only).
+     */
     @FXML
     private void handleMarkSoldAd() {
         if (!Dialogs.confirm("Mark \"" + ad.getTitle() + "\" as sold?")) {
@@ -317,6 +358,9 @@ public class AdDetailsController {
         }
     }
 
+    /**
+     * returns to the previous scene (either home, my-ads, or admin panel).
+     */
     @FXML
     private void goBack() {
         String target = SceneManager.getReturnScene();
