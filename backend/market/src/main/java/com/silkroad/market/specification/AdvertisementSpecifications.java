@@ -14,11 +14,22 @@ public class AdvertisementSpecifications {
         return (root, query, cb) -> cb.equal(root.get("status"), AdvertisementStatus.APPROVED);
     }
 
-    public static Specification<Advertisement> titleContains(String keyword) {
+    public static Specification<Advertisement> titleOrDescriptionContains(
+            String keyword) {
 
-        return (root, query, cb) -> cb.like(
-                cb.lower(root.get("title")),
-                "%" + keyword.toLowerCase() + "%");
+        return (root, query, cb) -> {
+
+            String pattern = "%" + keyword.toLowerCase() + "%";
+
+            return cb.or(
+                    cb.like(
+                            cb.lower(root.get("title")),
+                            pattern),
+
+                    cb.like(
+                            cb.lower(root.get("description")),
+                            pattern));
+        };
     }
 
     public static Specification<Advertisement> categoryIs(Long categoryId) {
