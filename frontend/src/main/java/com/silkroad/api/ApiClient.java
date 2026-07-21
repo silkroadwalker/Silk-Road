@@ -27,6 +27,15 @@ public class ApiClient {
     private static final HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     private static final Gson gson = new Gson();
 
+    // helper to check response status and throw readable exceptions
+    private static void checkResponse(HttpResponse<?> response, String action) {
+        int code = response.statusCode();
+        if (code < 200 || code >= 300) {
+            String body = response.body() != null ? response.body().toString() : "";
+            throw new RuntimeException(action + " failed (http " + code + "): " + body);
+        }
+    }
+
     public static class ApiResult {
         public boolean success;
         public String message;
@@ -35,6 +44,14 @@ public class ApiClient {
         public String token;
     }
 
+    /**
+     * authenticate a user with username and password.
+     *
+     * @param username the user's login name
+     * @param password the user's password
+     * @return ApiResult containing token and user info
+     * @throws Exception if the request fails
+     */
     public static ApiResult login(String username, String password) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("username", username);
@@ -46,9 +63,21 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        checkResponse(response, "login");
         return parseAuthResponse(response);
     }
 
+    /**
+     * register a new user account.
+     *
+     * @param fullName the user's full name
+     * @param username desired unique username
+     * @param password account password
+     * @param phone    contact phone number
+     * @param email    contact email address
+     * @return ApiResult containing token and user info
+     * @throws Exception if the request fails
+     */
     public static ApiResult signup(String fullName, String username, String password, String phone, String email) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("fullName", fullName);
@@ -63,6 +92,7 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        checkResponse(response, "signup");
         return parseAuthResponse(response);
     }
 
@@ -85,6 +115,13 @@ public class ApiClient {
         return searchAds(filter);
     }
 
+    /**
+     * advanced search with multiple filters (keyword, category, city, price range).
+     *
+     * @param filter the search criteria
+     * @return list of matching active ads
+     * @throws Exception if the request fails
+     */
     public static List<Ad> searchAds(AdFilter filter) throws Exception {
         StringBuilder query = new StringBuilder("/api/ads?");
 
@@ -111,12 +148,8 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
-        } else {
-            throw new RuntimeException("Search failed: " + response.statusCode());
-        }
+        checkResponse(response, "search ads");
+        return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
     }
 
     public static List<Ad> getAds() throws Exception {
@@ -131,12 +164,8 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), new TypeToken<List<Category>>() {}.getType());
-        } else {
-            throw new RuntimeException("Failed to load categories: " + response.statusCode());
-        }
+        checkResponse(response, "load categories");
+        return gson.fromJson(response.body(), new TypeToken<List<Category>>() {}.getType());
     }
 
     public static void createCategory(String name) throws Exception {
@@ -149,9 +178,7 @@ public class ApiClient {
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "create category");
     }
 
     public static void updateCategory(Long id, String name) throws Exception {
@@ -164,9 +191,7 @@ public class ApiClient {
                 .method("PUT", HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "update category");
     }
 
     public static void deleteCategory(Long id) throws Exception {
@@ -175,11 +200,20 @@ public class ApiClient {
                 .DELETE()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "delete category");
     }
 
+    /**
+     * create a new advertisement with optional images.
+     *
+     * @param title       ad title
+     * @param description ad description
+     * @param price       price as string
+     * @param categoryId  category id
+     * @param cityId      city id
+     * @param imageFiles  list of image file paths (can be empty)
+     * @throws Exception if the request fails
+     */
     public static void createAd(String title, String description, String price, Long categoryId, Long cityId,
                                 List<Path> imageFiles) throws Exception {
         String boundary = "SilkRoadBoundary" + System.currentTimeMillis();
@@ -201,11 +235,15 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "create ad");
     }
 
+    /**
+     * fetch all ads posted by the currently logged-in user.
+     *
+     * @return list of user's own ads (all statuses)
+     * @throws Exception if the request fails
+     */
     public static List<Ad> getMyAds() throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/ads/my"))
                 .header("Authorization", "Bearer " + Session.getToken())
@@ -213,12 +251,8 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
-        } else {
-            throw new RuntimeException("Failed to load your ads: " + response.statusCode());
-        }
+        checkResponse(response, "get my ads");
+        return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
     }
 
     private static byte[] buildMultipartBody(String boundary, Map<String, String> fields,
@@ -250,6 +284,12 @@ public class ApiClient {
         return out.toByteArray();
     }
 
+    /**
+     * fetch all conversations for the current user.
+     *
+     * @return list of chat summaries with last message preview
+     * @throws Exception if the request fails
+     */
     public static List<ChatSummary> getChats() throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/chat"))
                 .header("Authorization", "Bearer " + Session.getToken())
@@ -257,12 +297,8 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), new TypeToken<List<ChatSummary>>() {}.getType());
-        } else {
-            throw new RuntimeException("Failed to load conversations: " + response.statusCode());
-        }
+        checkResponse(response, "load conversations");
+        return gson.fromJson(response.body(), new TypeToken<List<ChatSummary>>() {}.getType());
     }
 
     public static ChatDetail getChat(Long chatId) throws Exception {
@@ -272,14 +308,17 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), ChatDetail.class);
-        } else {
-            throw new RuntimeException("Failed to load conversation: " + response.statusCode());
-        }
+        checkResponse(response, "load conversation");
+        return gson.fromJson(response.body(), ChatDetail.class);
     }
 
+    /**
+     * send a first message to a seller (creates a new conversation if needed).
+     *
+     * @param advertisementId the ad id
+     * @param message         the message text
+     * @throws Exception if the request fails
+     */
     public static void sendMessage(Long advertisementId, String message) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("advertisementId", advertisementId);
@@ -292,10 +331,7 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to send message: " + response.statusCode());
-        }
+        checkResponse(response, "send message");
     }
 
     public static void replyToChat(Long chatId, String message) throws Exception {
@@ -309,10 +345,7 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to send reply: " + response.statusCode());
-        }
+        checkResponse(response, "reply to chat");
     }
 
     public static List<Ad> getFavorites() throws Exception {
@@ -322,12 +355,8 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
-        } else {
-            throw new RuntimeException("Failed to load favorites: " + response.statusCode());
-        }
+        checkResponse(response, "load favorites");
+        return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
     }
 
     public static void addFavorite(Long advertisementId) throws Exception {
@@ -337,10 +366,7 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to add favorite: " + response.statusCode());
-        }
+        checkResponse(response, "add favorite");
     }
 
     public static void removeFavorite(Long advertisementId) throws Exception {
@@ -350,12 +376,15 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to remove favorite: " + response.statusCode());
-        }
+        checkResponse(response, "remove favorite");
     }
 
+    /**
+     * fetch all ads waiting for admin approval.
+     *
+     * @return list of pending ads
+     * @throws Exception if the request fails
+     */
     public static List<Ad> getPendingAds() throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/ads/pending"))
                 .header("Authorization", "Bearer " + Session.getToken())
@@ -363,14 +392,16 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() >= 200 && response.statusCode() < 300) {
-            return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
-        } else {
-            throw new RuntimeException("Failed to load pending ads: " + response.statusCode());
-        }
+        checkResponse(response, "load pending ads");
+        return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
     }
 
+    /**
+     * approve a pending ad (admin only).
+     *
+     * @param advertisementId the ad id
+     * @throws Exception if the request fails
+     */
     public static void approveAd(Long advertisementId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/admin/ads/" + advertisementId + "/approve"))
                 .header("Authorization", "Bearer " + Session.getToken())
@@ -378,12 +409,16 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to approve ad: " + response.statusCode());
-        }
+        checkResponse(response, "approve ad");
     }
 
+    /**
+     * reject a pending ad with a reason (admin only).
+     *
+     * @param advertisementId the ad id
+     * @param reason          rejection reason (required)
+     * @throws Exception if the request fails
+     */
     public static void rejectAd(Long advertisementId, String reason) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("reason", reason);
@@ -395,12 +430,17 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to reject ad: " + response.statusCode());
-        }
+        checkResponse(response, "reject ad");
     }
 
+    /**
+     * submit a rating for a seller (1-5) with an optional comment.
+     *
+     * @param adId    the advertisement id
+     * @param score   rating from 1 to 5
+     * @param comment optional text (can be null)
+     * @throws Exception if the request fails (e.g. duplicate rating)
+     */
     public static void rateSeller(Long adId, int score, String comment) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("score", score);
@@ -414,11 +454,16 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to rate seller (" + response.statusCode() + "): " + response.body());
-        }
+        checkResponse(response, "rate seller");
     }
 
+    /**
+     * fetch detailed information for a single ad (including seller info and rating).
+     *
+     * @param adId the advertisement id
+     * @return detailed ad data
+     * @throws Exception if the request fails or ad not found
+     */
     public static AdDetail getAdDetails(Long adId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/api/ads/" + adId))
@@ -427,13 +472,17 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load ad details: " + response.statusCode());
-        }
-
+        checkResponse(response, "get ad details");
         return gson.fromJson(response.body(), AdDetail.class);
     }
 
+    /**
+     * admin-only endpoint to fetch any ad (including pending/rejected) by id.
+     *
+     * @param adId the advertisement id
+     * @return detailed ad data with full admin visibility
+     * @throws Exception if the request fails
+     */
     public static AdDetail getAdminAdDetails(Long adId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/api/admin/ads/" + adId))
@@ -442,10 +491,7 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load ad details: " + response.statusCode());
-        }
-
+        checkResponse(response, "get admin ad details");
         return gson.fromJson(response.body(), AdDetail.class);
     }
 
@@ -459,9 +505,7 @@ public class ApiClient {
                 .build();
 
         HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "load image");
         return response.body();
     }
 
@@ -481,9 +525,7 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "update ad");
     }
 
     public static List<City> getCities() throws Exception {
@@ -492,9 +534,7 @@ public class ApiClient {
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "load cities");
         return gson.fromJson(response.body(), new TypeToken<List<City>>() {}.getType());
     }
 
@@ -512,9 +552,7 @@ public class ApiClient {
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "mark ad as sold");
     }
 
     public static void deleteAd(Long adId) throws Exception {
@@ -523,9 +561,7 @@ public class ApiClient {
                 .DELETE()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "delete ad");
     }
 
     public static class AdminUser {
@@ -541,9 +577,7 @@ public class ApiClient {
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "load users");
         return gson.fromJson(response.body(), new TypeToken<List<AdminUser>>() {}.getType());
     }
 
@@ -553,9 +587,7 @@ public class ApiClient {
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "block user");
     }
 
     public static void unblockUser(Long userId) throws Exception {
@@ -564,8 +596,6 @@ public class ApiClient {
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("Failed to load image (" + response.statusCode() + ")");
-        }
+        checkResponse(response, "unblock user");
     }
 }
