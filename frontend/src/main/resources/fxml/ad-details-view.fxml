@@ -51,6 +51,12 @@
                     <Button fx:id="rateButton" onAction="#handleRateSeller" text="Rate Seller"/>
                 </HBox>
 
+                <HBox fx:id="ownerActionsBox" spacing="10" visible="false" managed="false">
+                    <Button fx:id="editButton" onAction="#handleEditAd" text="Edit" styleClass="primary-button"/>
+                    <Button fx:id="markSoldButton" onAction="#handleMarkSoldAd" text="Mark as Sold"/>
+                    <Button fx:id="deleteButton" onAction="#handleDeleteAd" text="Delete" styleClass="danger-button"/>
+                </HBox>
+
                 <Label fx:id="statusLabel" styleClass="status-label" wrapText="true"/>
             </VBox>
         </ScrollPane>
