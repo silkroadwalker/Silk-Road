@@ -8,7 +8,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.silkroad.ui.AdminController"
-            prefWidth="1000" prefHeight="680" styleClass="page-body">
+            prefWidth="1100" prefHeight="700" styleClass="page-body, admin-dash">
     <top>
         <HBox spacing="10" alignment="CENTER_LEFT" styleClass="top-bar">
             <padding>
@@ -19,38 +19,94 @@
         </HBox>
     </top>
     <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE">
+        <HBox>
 
-            <Tab text="Dashboard">
-                <BorderPane styleClass="page-body">
+            <!-- ============ SIDEBAR NAV ============ -->
+            <VBox styleClass="sidebar" prefWidth="220" minWidth="220" spacing="4">
+                <padding><Insets top="20" right="12" bottom="20" left="12"/></padding>
+
+                <Button fx:id="navDashboardBtn" text="Dashboard" onAction="#showDashboard"
+                        styleClass="nav-item, nav-item-active" maxWidth="Infinity"/>
+                <Button fx:id="navPendingBtn" text="Pending Ads" onAction="#showPending"
+                        styleClass="nav-item" maxWidth="Infinity"/>
+                <Button fx:id="navAllAdsBtn" text="All Ads" onAction="#showAllAds"
+                        styleClass="nav-item" maxWidth="Infinity"/>
+                <Button fx:id="navCategoriesBtn" text="Categories" onAction="#showCategories"
+                        styleClass="nav-item" maxWidth="Infinity"/>
+                <Button fx:id="navUsersBtn" text="Users" onAction="#showUsers"
+                        styleClass="nav-item" maxWidth="Infinity"/>
+            </VBox>
+
+            <!-- ============ CONTENT PANES ============ -->
+            <StackPane HBox.hgrow="ALWAYS">
+
+                <!-- Dashboard -->
+                <BorderPane fx:id="dashboardPane" styleClass="page-body" visible="true" managed="true">
                     <center>
                         <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER" styleClass="ads-grid-scroll">
-                            <VBox spacing="12">
-                                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
-                                <Label text="Overview" styleClass="section-title"/>
-                                <Label fx:id="totalUsersLabel" styleClass="detail-title"/>
-                                <Label fx:id="pendingAdsCountLabel" styleClass="detail-title"/>
-                                <Label fx:id="activeAdsCountLabel" styleClass="detail-title"/>
-                                <Button text="Refresh" onAction="#handleRefreshDashboard"/>
-                                <BarChart fx:id="dashboardChart" styleClass="dashboard-chart" legendVisible="false"
-                                          animated="false" categoryGap="60" barGap="4"
-                                          prefHeight="280" VBox.vgrow="NEVER">
-                                    <xAxis>
-                                        <CategoryAxis label="Metric" side="BOTTOM"/>
-                                    </xAxis>
-                                    <yAxis>
-                                        <NumberAxis label="Count" side="LEFT"/>
-                                    </yAxis>
-                                </BarChart>
-                                <Label fx:id="dashboardNoteLabel" styleClass="empty-state" wrapText="true"/>
+                            <VBox spacing="18">
+                                <padding><Insets top="20" right="24" bottom="24" left="24"/></padding>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <Label text="Overview" styleClass="section-title"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Button text="Refresh" onAction="#handleRefreshDashboard"/>
+                                </HBox>
+
+                                <HBox spacing="16">
+                                    <VBox styleClass="stat-card" spacing="14" HBox.hgrow="ALWAYS">
+                                        <HBox alignment="CENTER_LEFT" spacing="8">
+                                            <Label text="&#128101;" styleClass="stat-icon, stat-icon-green"/>
+                                            <Label text="TOTAL USERS" styleClass="stat-card-label"/>
+                                        </HBox>
+                                        <Label fx:id="totalUsersLabel" styleClass="detail-title"/>
+                                    </VBox>
+
+                                    <VBox styleClass="stat-card" spacing="14" HBox.hgrow="ALWAYS">
+                                        <HBox alignment="CENTER_LEFT" spacing="8">
+                                            <Label text="&#8987;" styleClass="stat-icon, stat-icon-orange"/>
+                                            <Label text="PENDING ADS" styleClass="stat-card-label"/>
+                                        </HBox>
+                                        <Label fx:id="pendingAdsCountLabel" styleClass="detail-title"/>
+                                    </VBox>
+
+                                    <VBox styleClass="stat-card" spacing="14" HBox.hgrow="ALWAYS">
+                                        <HBox alignment="CENTER_LEFT" spacing="8">
+                                            <Label text="&#9989;" styleClass="stat-icon, stat-icon-teal"/>
+                                            <Label text="ACTIVE ADS" styleClass="stat-card-label"/>
+                                        </HBox>
+                                        <Label fx:id="activeAdsCountLabel" styleClass="detail-title"/>
+                                    </VBox>
+                                </HBox>
+
+                                <HBox spacing="16">
+                                    <VBox styleClass="chart-card" spacing="12" HBox.hgrow="ALWAYS">
+                                        <Label text="Ads Overview" styleClass="section-title"/>
+                                        <BarChart fx:id="dashboardChart" styleClass="dashboard-chart" legendVisible="false"
+                                                  animated="false" categoryGap="60" barGap="4"
+                                                  prefHeight="320" VBox.vgrow="ALWAYS">
+                                            <xAxis>
+                                                <CategoryAxis label="Metric" side="BOTTOM"/>
+                                            </xAxis>
+                                            <yAxis>
+                                                <NumberAxis label="Count" side="LEFT"/>
+                                            </yAxis>
+                                        </BarChart>
+                                    </VBox>
+
+                                    <VBox styleClass="side-card" spacing="12" prefWidth="260" minWidth="240">
+                                        <Label text="Insights" styleClass="section-title"/>
+                                        <Label fx:id="dashboardNoteLabel" styleClass="empty-state" wrapText="true"/>
+                                    </VBox>
+                                </HBox>
+
                             </VBox>
                         </ScrollPane>
                     </center>
                 </BorderPane>
-            </Tab>
 
-            <Tab text="Pending Ads">
-                <BorderPane styleClass="page-body">
+                <!-- Pending Ads -->
+                <BorderPane fx:id="pendingPane" styleClass="page-body" visible="false" managed="false">
                     <top>
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <padding><Insets top="12" right="12" bottom="0" left="12"/></padding>
@@ -71,10 +127,9 @@
                         </Label>
                     </bottom>
                 </BorderPane>
-            </Tab>
 
-            <Tab text="All Ads">
-                <BorderPane styleClass="page-body">
+                <!-- All Ads -->
+                <BorderPane fx:id="allAdsPane" styleClass="page-body" visible="false" managed="false">
                     <top>
                         <HBox spacing="10" alignment="CENTER_LEFT">
                             <padding><Insets top="12" right="12" bottom="0" left="12"/></padding>
@@ -98,10 +153,9 @@
                         </VBox>
                     </bottom>
                 </BorderPane>
-            </Tab>
 
-            <Tab text="Categories">
-                <BorderPane styleClass="page-body">
+                <!-- Categories -->
+                <BorderPane fx:id="categoriesPane" styleClass="page-body" visible="false" managed="false">
                     <center>
                         <ListView fx:id="categoriesListView" BorderPane.alignment="CENTER">
                             <BorderPane.margin><Insets top="12" right="12" bottom="0" left="12"/></BorderPane.margin>
@@ -120,10 +174,9 @@
                         </VBox>
                     </bottom>
                 </BorderPane>
-            </Tab>
 
-            <Tab text="Users">
-                <BorderPane styleClass="page-body">
+                <!-- Users -->
+                <BorderPane fx:id="usersPane" styleClass="page-body" visible="false" managed="false">
                     <center>
                         <ListView fx:id="usersListView" BorderPane.alignment="CENTER">
                             <BorderPane.margin><Insets top="12" right="12" bottom="0" left="12"/></BorderPane.margin>
@@ -141,8 +194,8 @@
                         </VBox>
                     </bottom>
                 </BorderPane>
-            </Tab>
 
-        </TabPane>
+            </StackPane>
+        </HBox>
     </center>
 </BorderPane>
