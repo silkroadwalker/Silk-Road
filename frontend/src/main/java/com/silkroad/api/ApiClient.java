@@ -488,6 +488,25 @@ public class ApiClient {
     }
 
     /**
+     * fetch all buyer ratings/reviews left on a specific advertisement.
+     *
+     * @param adId the advertisement id
+     * @return list of ratings (buyer username, score 1-5, optional comment)
+     * @throws Exception if the request fails
+     */
+    public static List<Rating> getAdvertisementRatings(Long adId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/ads/" + adId + "/ratings"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        checkResponse(response, "load ratings");
+        return gson.fromJson(response.body(), new TypeToken<List<Rating>>() {}.getType());
+    }
+
+    /**
      * admin-only endpoint to fetch any ad (including pending/rejected) by id.
      *
      * @param adId the advertisement id

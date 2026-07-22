@@ -45,6 +45,12 @@
                     <Label fx:id="ownerNoteLabel" styleClass="muted-label" wrapText="true"/>
                 </VBox>
 
+                <VBox spacing="8" styleClass="detail-card">
+                    <Label text="Reviews" styleClass="section-title"/>
+                    <VBox fx:id="ratingsBox" spacing="10"/>
+                    <Label fx:id="noRatingsLabel" text="No reviews yet." styleClass="muted-label"/>
+                </VBox>
+
                 <HBox spacing="10">
                     <Button fx:id="favoriteButton" onAction="#handleToggleFavorite" text="Add to Favorites"/>
                     <Button fx:id="messageButton" onAction="#handleMessageSeller" text="Message Seller" styleClass="primary-button"/>

@@ -3,6 +3,7 @@ package com.silkroad.ui;
 import com.silkroad.api.ApiClient;
 import com.silkroad.model.Ad;
 import com.silkroad.model.AdDetail;
+import com.silkroad.model.Rating;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -14,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -40,6 +42,8 @@ public class AdDetailsController {
     @FXML private Label sellerLabel;
     @FXML private Label sellerRatingLabel;
     @FXML private Label ownerNoteLabel;
+    @FXML private VBox ratingsBox;
+    @FXML private Label noRatingsLabel;
     @FXML private Button favoriteButton;
     @FXML private Button messageButton;
     @FXML private Button rateButton;
@@ -84,6 +88,7 @@ public class AdDetailsController {
 
         render();
         loadImages();
+        loadRatings();
         if (!ad.isSubmitter()) {
             loadFavoriteState();
         }
@@ -212,6 +217,60 @@ public class AdDetailsController {
         popup.show();
     }
 
+    /**
+     * loads the buyer ratings/reviews left on this ad and renders them
+     * as a list of rows (star score + comment + reviewer username).
+     * shows a "no reviews yet" placeholder when the list is empty.
+     */
+    private void loadRatings() {
+        try {
+            List<Rating> ratings = ApiClient.getAdvertisementRatings(ad.getId());
+            ratingsBox.getChildren().clear();
+
+            if (ratings == null || ratings.isEmpty()) {
+                noRatingsLabel.setVisible(true);
+                noRatingsLabel.setManaged(true);
+                return;
+            }
+
+            noRatingsLabel.setVisible(false);
+            noRatingsLabel.setManaged(false);
+
+            for (Rating rating : ratings) {
+                ratingsBox.getChildren().add(buildRatingRow(rating));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // don't block the rest of the page if reviews fail to load
+        }
+    }
+
+    /**
+     * builds a single review row: reviewer avatar/username, a star
+     * representation of the score, and the optional comment text.
+     */
+    private VBox buildRatingRow(Rating rating) {
+        Label header = new Label("@" + rating.getBuyerUsername() + " · " + stars(rating.getScore()));
+        header.setGraphic(UiComponents.avatar(rating.getBuyerUsername(), 24));
+        header.setGraphicTextGap(8);
+        header.getStyleClass().add("muted-label");
+
+        VBox row = new VBox(4, header);
+
+        if (rating.getComment() != null && !rating.getComment().isBlank()) {
+            Label commentLabel = new Label(rating.getComment());
+            commentLabel.setWrapText(true);
+            row.getChildren().add(commentLabel);
+        }
+
+        return row;
+    }
+
+    private String stars(Integer score) {
+        int filled = score == null ? 0 : Math.max(0, Math.min(5, score));
+        return "★".repeat(filled) + "☆".repeat(5 - filled);
+    }
+
     private void loadFavoriteState() {
         try {
             List<Ad> favorites = ApiClient.getFavorites();
@@ -303,9 +362,9 @@ public class AdDetailsController {
         try {
             ApiClient.rateSeller(ad.getId(), score, comment);
             Dialogs.info("Thanks for rating the seller!");
-            loadFavoriteState();
             ad = ApiClient.getAdDetails(ad.getId());
             render();
+            loadRatings();
         } catch (Exception e) {
             e.printStackTrace();
             statusLabel.setText("Could not submit rating: " + e.getMessage());
