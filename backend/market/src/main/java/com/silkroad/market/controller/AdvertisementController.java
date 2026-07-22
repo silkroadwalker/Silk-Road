@@ -24,8 +24,10 @@ import com.silkroad.market.dto.advertisement.AdvertisementSummaryResponse;
 import com.silkroad.market.dto.advertisement.CreateAdvertisementRequest;
 import com.silkroad.market.dto.advertisement.UpdateAdvertisementRequest;
 import com.silkroad.market.dto.rating.CreateRatingRequest;
+import com.silkroad.market.dto.rating.RatingResponse;
 import com.silkroad.market.entity.AdvertisementStatus;
 import com.silkroad.market.service.AdvertisementService;
+import com.silkroad.market.service.RatingService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -35,9 +37,14 @@ import jakarta.validation.Valid;
 public class AdvertisementController {
 
         private final AdvertisementService advertisementService;
+        private final RatingService ratingService;
 
-        public AdvertisementController(AdvertisementService advertisementService) {
+        public AdvertisementController(
+                        AdvertisementService advertisementService,
+                        RatingService ratingService) {
+
                 this.advertisementService = advertisementService;
+                this.ratingService = ratingService;
         }
 
         @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -130,6 +137,15 @@ public class AdvertisementController {
 
                 return advertisementService.getMyAdvertisements(
                                 authentication.getName());
+        }
+
+        @GetMapping("/{advertisementId}/ratings")
+        @SecurityRequirement(name = "bearerAuth")
+
+        public List<RatingResponse> getAdvertisementRatings(
+                        @PathVariable Long advertisementId) {
+
+                return ratingService.getAdvertisementRatings(advertisementId);
         }
 
 }

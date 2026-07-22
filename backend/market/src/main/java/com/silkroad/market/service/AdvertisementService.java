@@ -125,7 +125,7 @@ public class AdvertisementService {
                                 !request.getKeyword().isBlank()) {
 
                         specification = specification.and(
-                                        AdvertisementSpecifications.titleContains(
+                                        AdvertisementSpecifications.titleOrDescriptionContains(
                                                         request.getKeyword()));
                 }
 
