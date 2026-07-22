@@ -46,8 +46,8 @@ public class AdvertisementController {
         private final RatingService ratingService;
 
         public AdvertisementController(
-                        AdvertisementService advertisementService,
-                        RatingService ratingService) {
+                AdvertisementService advertisementService,
+                RatingService ratingService) {
 
                 this.advertisementService = advertisementService;
                 this.ratingService = ratingService;
@@ -64,21 +64,21 @@ public class AdvertisementController {
         @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         @SecurityRequirement(name = "bearerAuth")
         public ResponseEntity<String> createAdvertisement(
-                        Authentication authentication,
-                        @Valid @ModelAttribute CreateAdvertisementRequest request)
-                        throws IOException {
+                Authentication authentication,
+                @Valid @ModelAttribute CreateAdvertisementRequest request)
+                throws IOException {
 
                 advertisementService.createAdvertisement(
-                                request,
-                                authentication.getName());
+                        request,
+                        authentication.getName());
 
                 return ResponseEntity.status(HttpStatus.CREATED)
-                                .body("Advertisement created successfully.");
+                        .body("Advertisement created successfully.");
         }
 
         @GetMapping
         public List<AdvertisementSummaryResponse> searchAdvertisements(
-                        @ModelAttribute AdvertisementSearchRequest request) {
+                @ModelAttribute AdvertisementSearchRequest request) {
 
                 return advertisementService.searchAdvertisements(request);
         }
@@ -86,78 +86,78 @@ public class AdvertisementController {
         @GetMapping("/{id}")
         @SecurityRequirement(name = "bearerAuth")
         public AdvertisementDetailedResponse getAdvertisement(
-                        @PathVariable Long id,
-                        Authentication authentication) {
+                @PathVariable Long id,
+                Authentication authentication) {
 
                 return advertisementService.getAdvertisementDetails(
-                                id,
-                                AdvertisementStatus.APPROVED,
-                                authentication);
+                        id,
+                        AdvertisementStatus.APPROVED,
+                        authentication);
         }
 
         @PatchMapping("/{id}")
         @SecurityRequirement(name = "bearerAuth")
         public void updateAdvertisement(
-                        @PathVariable Long id,
-                        @RequestBody UpdateAdvertisementRequest request,
-                        Authentication authentication) {
+                @PathVariable Long id,
+                @RequestBody UpdateAdvertisementRequest request,
+                Authentication authentication) {
 
                 advertisementService.updateAdvertisement(
-                                id,
-                                request,
-                                authentication.getName());
+                        id,
+                        request,
+                        authentication.getName());
         }
 
         @PatchMapping("/{id}/markSold")
         @SecurityRequirement(name = "bearerAuth")
         public void updateAdvertisementStatusToSold(
-                        @PathVariable Long id,
-                        Authentication authentication) {
+                @PathVariable Long id,
+                Authentication authentication) {
 
                 advertisementService.updateAdvertisementStatusToSold(
-                                id,
-                                authentication.getName());
+                        id,
+                        authentication.getName());
         }
 
         @DeleteMapping("/{id}")
         @SecurityRequirement(name = "bearerAuth")
         public void deleteAdvertisement(
-                        @PathVariable Long id,
-                        Authentication authentication) {
+                @PathVariable Long id,
+                Authentication authentication) {
 
                 advertisementService.deleteAdvertisement(
-                                id,
-                                authentication.getName());
+                        id,
+                        authentication);
         }
 
         @PostMapping("/{id}/rating")
         @SecurityRequirement(name = "bearerAuth")
         @ResponseStatus(HttpStatus.CREATED)
         public void rateAdvertisement(
-                        @PathVariable Long id,
-                        @Valid @RequestBody CreateRatingRequest request,
-                        Authentication authentication) {
+                @PathVariable Long id,
+                @Valid @RequestBody CreateRatingRequest request,
+                Authentication authentication) {
 
                 advertisementService.rateAdvertisement(
-                                id,
-                                request,
-                                authentication.getName());
+                        id,
+                        request,
+                        authentication.getName());
         }
 
         @GetMapping("/my")
         @SecurityRequirement(name = "bearerAuth")
         public List<AdvertisementSummaryResponse> getMyAdvertisements(
-                        Authentication authentication) {
+                Authentication authentication) {
 
                 return advertisementService.getMyAdvertisements(
-                                authentication.getName());
+                        authentication.getName());
         }
 
         @GetMapping("/{advertisementId}/ratings")
         @SecurityRequirement(name = "bearerAuth")
 
         public List<RatingResponse> getAdvertisementRatings(
-                        @PathVariable Long advertisementId) {
+                @PathVariable Long advertisementId) {
 
                 return ratingService.getAdvertisementRatings(advertisementId);
         }
