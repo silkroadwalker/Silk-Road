@@ -804,18 +804,22 @@
    ===================================================================== */
 
 .page-body.home-page {
-    -fx-background-color: #fcfce1;
+    -fx-background-color: #eef4ec;
 }
 
-.home-page.home-top-bar {
-    -fx-background-color: transparent;
+.top-bar.home-top-bar {
+    -fx-background-color: #F4F2EC;
     -fx-border-color: transparent transparent #E4E1D6 transparent;
     -fx-border-width: 0 0 1 0;
 }
 
 .home-page .home-title {
     -fx-font-size: 24px;
-    -fx-text-fill: linear-gradient(to right, #2E7D5B, #C9932F);
+    -fx-text-fill: #2C3327;
+}
+
+.home-page .home-filter-bar {
+    -fx-background-color: #F4F2EC;
 }
 
 .home-page .home-create-button {

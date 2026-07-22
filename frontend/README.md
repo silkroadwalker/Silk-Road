@@ -92,7 +92,7 @@ Sign up and login with backend-side validation, and storing the received JWT tok
 Displays approved ads in a grid, with keyword search and sorting.
 
 `![Home screen](docs/screenshots/home.png)`
-> ![img_2.png](img_2.png)
+> ![img_12.png](img_12.png)
 
 ### Creating an Ad
 Form for creating a new ad, with category (and subcategory), city, price, description, and multiple image uploads.
@@ -143,4 +143,4 @@ Lets a user leave a rating and comment for a seller after a deal, and shows thos
 Lets an admin review pending ads and approve/reject them.
 
 `![Admin panel](docs/screenshots/admin.png)`
->![img_11.png](img_11.png)
+>![img_13.png](img_13.png)
