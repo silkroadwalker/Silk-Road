@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 
 import java.util.ArrayList;
@@ -59,6 +60,18 @@ public class AdminController {
     private ListView<ApiClient.AdminUser> usersListView;
     @FXML
     private Label usersStatusLabel;
+
+    @FXML private BorderPane dashboardPane;
+    @FXML private BorderPane pendingPane;
+    @FXML private BorderPane allAdsPane;
+    @FXML private BorderPane categoriesPane;
+    @FXML private BorderPane usersPane;
+
+    @FXML private Button navDashboardBtn;
+    @FXML private Button navPendingBtn;
+    @FXML private Button navAllAdsBtn;
+    @FXML private Button navCategoriesBtn;
+    @FXML private Button navUsersBtn;
 
     /**
      * called by javafx after fxml loading. initialises all admin tabs
@@ -503,6 +516,46 @@ public class AdminController {
         } catch (Exception e) {
             usersStatusLabel.setText("Could not unblock user: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void showDashboard() {
+        setActivePane(dashboardPane, navDashboardBtn);
+    }
+
+    @FXML
+    private void showPending() {
+        setActivePane(pendingPane, navPendingBtn);
+    }
+
+    @FXML
+    private void showAllAds() {
+        setActivePane(allAdsPane, navAllAdsBtn);
+    }
+
+    @FXML
+    private void showCategories() {
+        setActivePane(categoriesPane, navCategoriesBtn);
+    }
+
+    @FXML
+    private void showUsers() {
+        setActivePane(usersPane, navUsersBtn);
+    }
+
+    private void setActivePane(BorderPane pane, Button navBtn) {
+        BorderPane[] panes = { dashboardPane, pendingPane, allAdsPane, categoriesPane, usersPane };
+        for (BorderPane p : panes) {
+            boolean active = (p == pane);
+            p.setVisible(active);
+            p.setManaged(active);
+        }
+
+        Button[] navButtons = { navDashboardBtn, navPendingBtn, navAllAdsBtn, navCategoriesBtn, navUsersBtn };
+        for (Button b : navButtons) {
+            b.getStyleClass().remove("nav-item-active");
+        }
+        navBtn.getStyleClass().add("nav-item-active");
     }
 
     @FXML

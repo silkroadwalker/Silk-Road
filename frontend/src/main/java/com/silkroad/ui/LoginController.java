@@ -6,6 +6,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
+import java.net.ConnectException;
+
 public class LoginController {
 
     @FXML
@@ -55,10 +58,16 @@ public class LoginController {
                     SceneManager.switchScene("/fxml/home-view.fxml");
                 }
             } else {
-                showError(result.message != null ? result.message : "Login failed.");
+                showError(result.message != null ? result.message : "Invalid username or password.");
             }
-        } catch (Exception e) {
+        } catch (ConnectException e) {
+            // backend isn't running / refused the connection
             showError("Could not connect to server.");
+        } catch (IOException e) {
+            // any other network-level failure (timeout, DNS, etc.)
+            showError("Could not connect to server.");
+        } catch (Exception e) {
+            showError("Something went wrong. Please try again.");
             e.printStackTrace();
         }
     }

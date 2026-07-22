@@ -63,7 +63,6 @@ public class ApiClient {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        checkResponse(response, "login");
         return parseAuthResponse(response);
     }
 
@@ -165,6 +164,18 @@ public class ApiClient {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         checkResponse(response, "load categories");
+        return gson.fromJson(response.body(), new TypeToken<List<Category>>() {}.getType());
+    }
+
+    public static List<Category> getSubcategories(Long parentId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/categories/" + parentId + "/subcategories"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        checkResponse(response, "load subcategories");
         return gson.fromJson(response.body(), new TypeToken<List<Category>>() {}.getType());
     }
 

@@ -466,3 +466,437 @@
 .dashboard-chart .default-color0.chart-bar {
     -fx-bar-fill: #5C7A5E;
 }
+
+/* =====================================================================
+   ADMIN DASHBOARD — DARK THEME
+   Scoped entirely under ".admin-dash" (the extra style class added to the
+   root BorderPane in admin-view.fxml) so nothing else in the app changes.
+   Append this block to the end of your existing stylesheet.
+   ===================================================================== */
+
+.admin-dash {
+    -fx-background-color: #0F1512;
+}
+
+.admin-dash .page-body {
+    -fx-background-color: #0F1512;
+}
+
+.admin-dash .top-bar {
+    -fx-background-color: #101613;
+    -fx-border-color: transparent transparent #1E2620 transparent;
+}
+
+.admin-dash .label,
+.admin-dash .page-title,
+.admin-dash .section-title {
+    -fx-text-fill: #E7ECE7;
+}
+
+.admin-dash .back-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #232D27;
+    -fx-text-fill: #E7ECE7;
+}
+
+.admin-dash .back-button:hover {
+    -fx-background-color: #1A2420;
+    -fx-border-color: #34D399;
+}
+
+/* ---------------------------------------------------------------------
+   Sidebar-style tabs (TabPane side="LEFT")
+   --------------------------------------------------------------------- */
+
+.admin-dash .tab-pane {
+    -fx-tab-min-width: 176px;
+    -fx-tab-max-width: 176px;
+    -fx-background-color: #0F1512;
+}
+
+.admin-dash .tab-pane .tab-header-area {
+    -fx-background-color: #0B100D;
+    -fx-padding: 24 0 0 0;
+    -fx-border-color: transparent #1E2620 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.admin-dash .tab-pane .tab-header-background {
+    -fx-background-color: #0B100D;
+}
+
+/* Un-rotate the vertical tab labels back to horizontal text */
+.admin-dash .tab-pane:left .tab {
+    -fx-rotate: 90;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 12 0;
+}
+
+.admin-dash .tab-pane:left .tab .tab-container {
+    -fx-rotate: -90;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 0 0 20;
+}
+
+.admin-dash .tab .tab-label {
+    -fx-text-fill: #9BA89D;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+}
+
+.admin-dash .tab:selected {
+    -fx-background-color: linear-gradient(to right, rgba(52,211,153,0.16), rgba(52,211,153,0.02));
+    -fx-border-color: #34D399 transparent transparent transparent;
+    -fx-border-width: 0 0 0 0;
+}
+
+.admin-dash .tab:selected .tab-label {
+    -fx-text-fill: #34D399;
+}
+
+.admin-dash .tab-pane .tab-content-area {
+    -fx-background-color: #0F1512;
+}
+
+/* ---------------------------------------------------------------------
+   Stat cards / chart card / side card
+   --------------------------------------------------------------------- */
+
+.admin-dash .stat-card,
+.admin-dash .chart-card,
+.admin-dash .side-card {
+    -fx-background-color: #171F1B;
+    -fx-background-radius: 14px;
+    -fx-border-color: #232D27;
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+    -fx-padding: 18px;
+}
+
+.admin-dash .stat-card-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #7C8A7E;
+}
+
+.admin-dash .detail-title {
+    -fx-text-fill: #F1F5F1;
+}
+
+.admin-dash .stat-icon {
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-max-width: 28px;
+    -fx-max-height: 28px;
+    -fx-alignment: CENTER;
+    -fx-background-radius: 8px;
+    -fx-font-size: 13px;
+}
+
+.admin-dash .stat-icon-green  { -fx-background-color: rgba(52,211,153,0.15); }
+.admin-dash .stat-icon-orange { -fx-background-color: rgba(245,166,35,0.15); }
+.admin-dash .stat-icon-teal   { -fx-background-color: rgba(74,193,217,0.15); }
+.admin-dash .stat-icon-red    { -fx-background-color: rgba(242,84,91,0.15); }
+
+.admin-dash .empty-state {
+    -fx-text-fill: #7C8A7E;
+}
+
+/* ---------------------------------------------------------------------
+   Bar chart
+   --------------------------------------------------------------------- */
+
+.admin-dash .dashboard-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.admin-dash .dashboard-chart .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.admin-dash .dashboard-chart .chart-horizontal-grid-lines {
+    -fx-stroke: #232D27;
+}
+
+.admin-dash .dashboard-chart .axis {
+    -fx-tick-label-fill: #7C8A7E;
+}
+
+.admin-dash .dashboard-chart .axis-label {
+    -fx-text-fill: #7C8A7E;
+}
+
+.admin-dash .dashboard-chart .default-color0.chart-bar {
+    -fx-bar-fill: #34D399;
+}
+
+/* ---------------------------------------------------------------------
+   Buttons / fields / lists (Pending / All Ads / Categories / Users tabs)
+   --------------------------------------------------------------------- */
+
+.admin-dash .button {
+    -fx-background-color: #171F1B;
+    -fx-text-fill: #E7ECE7;
+    -fx-border-color: #232D27;
+}
+
+.admin-dash .button:hover {
+    -fx-background-color: #1E2A22;
+    -fx-border-color: #34D399;
+}
+
+.admin-dash .button:pressed {
+    -fx-background-color: #16201A;
+}
+
+.admin-dash .primary-button {
+    -fx-background-color: #34D399;
+    -fx-text-fill: #05140D;
+    -fx-border-color: transparent;
+}
+
+.admin-dash .primary-button:hover {
+    -fx-background-color: #2BBE89;
+}
+
+.admin-dash .danger-button {
+    -fx-background-color: rgba(242,84,91,0.15);
+    -fx-text-fill: #F2545B;
+    -fx-border-color: rgba(242,84,91,0.35);
+}
+
+.admin-dash .danger-button:hover {
+    -fx-background-color: rgba(242,84,91,0.25);
+}
+
+.admin-dash .text-field,
+.admin-dash .text-area,
+.admin-dash .password-field {
+    -fx-background-color: #171F1B;
+    -fx-text-fill: #E7ECE7;
+    -fx-prompt-text-fill: #7C8A7E;
+    -fx-border-color: #232D27;
+}
+
+.admin-dash .text-field:focused {
+    -fx-border-color: #34D399;
+}
+
+.admin-dash .list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #232D27;
+}
+
+.admin-dash .list-cell {
+    -fx-background-color: #171F1B;
+    -fx-text-fill: #E7ECE7;
+    -fx-border-color: transparent transparent #232D27 transparent;
+}
+
+.admin-dash .list-cell:filled:hover {
+    -fx-background-color: #1B241F;
+}
+
+.admin-dash .list-cell:filled:selected {
+    -fx-background-color: rgba(52,211,153,0.12);
+    -fx-text-fill: #34D399;
+}
+
+/* ---------------------------------------------------------------------
+   Ad cards + status tags (used in Pending Ads / All Ads FlowPanes)
+   --------------------------------------------------------------------- */
+
+.admin-dash .ad-card {
+    -fx-background-color: #171F1B;
+    -fx-border-color: #232D27;
+    -fx-effect: none;
+}
+
+.admin-dash .ad-card:hover {
+    -fx-border-color: #34D399;
+    -fx-effect: none;
+}
+
+.admin-dash .ad-card-image-wrap {
+    -fx-background-color: #1E2620;
+}
+
+.admin-dash .ad-card-title {
+    -fx-text-fill: #F1F5F1;
+}
+
+.admin-dash .ad-card-meta {
+    -fx-text-fill: #7C8A7E;
+}
+
+.admin-dash .ad-card-price {
+    -fx-text-fill: #34D399;
+}
+
+.admin-dash .tag-pending {
+    -fx-background-color: rgba(245,166,35,0.15);
+    -fx-text-fill: #F5A623;
+}
+
+.admin-dash .tag-approved {
+    -fx-background-color: rgba(52,211,153,0.15);
+    -fx-text-fill: #34D399;
+}
+
+.admin-dash .tag-rejected {
+    -fx-background-color: rgba(242,84,91,0.15);
+    -fx-text-fill: #F2545B;
+}
+
+.admin-dash .tag-sold {
+    -fx-background-color: rgba(74,144,217,0.15);
+    -fx-text-fill: #4A90D9;
+}
+/* =====================================================================
+   ADMIN — SIDEBAR NAV (replaces the old rotated TabPane approach)
+   Delete the old ".tab-pane" / ".tab" rules from the previous CSS block
+   (the section titled "Sidebar-style tabs (TabPane side=\"LEFT\")") —
+   they're no longer used since admin-view.fxml no longer uses TabPane.
+   ===================================================================== */
+
+.admin-dash .sidebar {
+    -fx-background-color: #0B100D;
+    -fx-border-color: transparent #1E2620 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.admin-dash .nav-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9BA89D;
+    -fx-border-color: transparent;
+    -fx-background-radius: 10px;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 600;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 16;
+    -fx-pref-height: 44px;
+}
+
+.admin-dash .nav-item:hover {
+    -fx-background-color: #171F1B;
+    -fx-text-fill: #E7ECE7;
+}
+
+.admin-dash .nav-item-active {
+    -fx-background-color: linear-gradient(to right, rgba(52,211,153,0.18), rgba(52,211,153,0.04));
+    -fx-text-fill: #34D399;
+    -fx-border-color: transparent transparent transparent #34D399;
+    -fx-border-width: 0 0 0 3;
+    -fx-padding: 12 16 12 13;
+}
+
+.admin-dash .nav-item-active:hover {
+    -fx-background-color: linear-gradient(to right, rgba(52,211,153,0.22), rgba(52,211,153,0.06));
+    -fx-text-fill: #34D399;
+}
+
+
+/* =====================================================================
+   HOME PAGE — LIGHT THEME, MORE COLORFUL
+   Scoped under ".home-page" so no other screen is affected.
+   ===================================================================== */
+
+.page-body.home-page {
+    -fx-background-color: #eef4ec;
+}
+
+.top-bar.home-top-bar {
+    -fx-background-color: #F4F2EC;
+    -fx-border-color: transparent transparent #E4E1D6 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.home-page .home-title {
+    -fx-font-size: 24px;
+    -fx-text-fill: #2C3327;
+}
+
+.home-page .home-filter-bar {
+    -fx-background-color: #F4F2EC;
+}
+
+.home-page .home-create-button {
+    -fx-background-color: linear-gradient(to right, #5C7A5E, #2E9E6D);
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: 700;
+}
+
+.home-page .home-create-button:hover {
+    -fx-background-color: linear-gradient(to right, #4C6A4E, #24855B);
+}
+
+/* Colorful nav pills */
+.home-page .nav-pill {
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1.5px;
+    -fx-font-weight: 700;
+    -fx-font-size: 12.5px;
+    -fx-padding: 7px 16px;
+}
+
+.home-page .nav-pill-mint {
+    -fx-background-color: #E4F5EC;
+    -fx-text-fill: #2E9E6D;
+    -fx-border-color: #BEE6D2;
+}
+.home-page .nav-pill-mint:hover { -fx-background-color: #D2EEDF; }
+
+.home-page .nav-pill-coral {
+    -fx-background-color: #FDEBE6;
+    -fx-text-fill: #D9694A;
+    -fx-border-color: #F6CFC2;
+}
+.home-page .nav-pill-coral:hover { -fx-background-color: #FADCD3; }
+
+.home-page .nav-pill-sky {
+    -fx-background-color: #E7F1FB;
+    -fx-text-fill: #3E7BC4;
+    -fx-border-color: #C6DFF4;
+}
+.home-page .nav-pill-sky:hover { -fx-background-color: #D5E7F8; }
+
+.home-page .nav-pill-gold {
+    -fx-background-color: #FDF3DC;
+    -fx-text-fill: #C9932F;
+    -fx-border-color: #F3E1B0;
+}
+.home-page .nav-pill-gold:hover { -fx-background-color: #FAEAC0; }
+
+.home-page .nav-pill-muted {
+    -fx-background-color: #F0EFEA;
+    -fx-text-fill: #6B7263;
+    -fx-border-color: #E4E1D6;
+}
+.home-page .nav-pill-muted:hover { -fx-background-color: #E6E4DC; }
+
+/* Filter bar + search accents */
+.home-page .home-filter-bar .text-field:focused,
+.home-page .home-filter-bar .combo-box:focused {
+    -fx-border-color: #2E9E6D;
+}
+
+.home-page .home-filter-bar .primary-button {
+    -fx-background-color: linear-gradient(to right, #5C7A5E, #2E9E6D);
+}
+
+/* Ad cards a bit livelier on this page */
+.home-page .ad-card {
+    -fx-border-color: #EDEAE0;
+}
+
+.home-page .ad-card:hover {
+    -fx-border-color: #2E9E6D;
+    -fx-effect: dropshadow(gaussian, rgba(46,158,109,0.22), 16, 0, 0, 5);
+}
+
+.home-page .ad-card-price {
+    -fx-text-fill: #2E9E6D;
+}

@@ -7,23 +7,24 @@
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.silkroad.ui.HomeController"
-            prefWidth="1000" prefHeight="680" styleClass="page-body">
+            prefWidth="1000" prefHeight="680" styleClass="page-body, home-page">
 
     <top>
-        <VBox styleClass="top-bar">
+        <VBox styleClass="top-bar, home-top-bar">
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <padding><Insets top="12" right="16" bottom="8" left="16"/></padding>
-                <Label fx:id="welcomeLabel" text="Welcome!" styleClass="page-title"/>
+                <Label fx:id="welcomeLabel" text="Welcome!" styleClass="page-title, home-title"/>
                 <Pane HBox.hgrow="ALWAYS"/>
-                <Button text="Create Ad" onAction="#goToCreateAd" styleClass="primary-button"/>
-                <Button text="My Ads" onAction="#goToMyAds"/>
-                <Button text="Favorites" onAction="#goToFavorites"/>
-                <Button text="Messages" onAction="#goToMessages"/>
-                <Button fx:id="adminButton" text="Admin" onAction="#goToAdmin" visible="false" managed="false"/>
-                <Button text="Logout" onAction="#handleLogout"/>
+                <Button text="Create Ad" onAction="#goToCreateAd" styleClass="primary-button, home-create-button"/>
+                <Button text="My Ads" onAction="#goToMyAds" styleClass="nav-pill, nav-pill-mint"/>
+                <Button text="Favorites" onAction="#goToFavorites" styleClass="nav-pill, nav-pill-coral"/>
+                <Button text="Messages" onAction="#goToMessages" styleClass="nav-pill, nav-pill-sky"/>
+                <Button fx:id="adminButton" text="Admin" onAction="#goToAdmin" visible="false" managed="false"
+                        styleClass="nav-pill, nav-pill-gold"/>
+                <Button text="Logout" onAction="#handleLogout" styleClass="nav-pill, nav-pill-muted"/>
             </HBox>
 
-            <HBox spacing="8" alignment="CENTER_LEFT">
+            <HBox spacing="8" alignment="CENTER_LEFT" styleClass="home-filter-bar">
                 <padding><Insets top="0" right="16" bottom="12" left="16"/></padding>
                 <TextField fx:id="searchField" promptText="Search ads..." HBox.hgrow="ALWAYS"/>
                 <ComboBox fx:id="categoryFilterBox" promptText="Category" prefWidth="130"/>
