@@ -411,12 +411,39 @@ public class AdvertisementService {
                 advertisementRepository.save(advertisement);
         }
 
+        /**
+         * deletes an advertisement. the ad's own seller can delete it
+         * regardless of status; an admin can delete any advertisement
+         * (including ones they don't own and ones already approved),
+         * which is what powers the "Delete" button in the admin panel.
+         *
+         * @param id             the advertisement id
+         * @param authentication the requester; used both for the username
+         *                       (ownership check) and their granted roles
+         *                       (admin override)
+         */
         @Transactional
         public void deleteAdvertisement(
                 Long id,
-                String username) {
+                Authentication authentication) {
 
-                Advertisement advertisement = getOwnedAdvertisement(id, username);
+                Advertisement advertisement = advertisementRepository.findById(id)
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
+
+                boolean isAdmin = authentication.getAuthorities().stream()
+                        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+                boolean isOwner = advertisement.getSeller()
+                        .getUsername()
+                        .equals(authentication.getName());
+
+                if (!isAdmin && !isOwner) {
+                        throw new ApiException(
+                                "Access denied",
+                                HttpStatus.FORBIDDEN);
+                }
 
                 advertisementRepository.delete(advertisement);
         }
