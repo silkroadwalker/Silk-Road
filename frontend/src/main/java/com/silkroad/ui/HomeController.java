@@ -25,7 +25,7 @@ public class HomeController {
     @FXML
     private TextField searchField;
     @FXML
-    private ComboBox<Category> categoryFilterBox;
+    private MenuButton categoryMenuButton;
     @FXML
     private ComboBox<City> cityFilterBox;
     @FXML
@@ -42,6 +42,10 @@ public class HomeController {
     private static final String SORT_NEWEST = "Newest first";
     private static final String SORT_CHEAPEST = "Cheapest first";
     private static final String SORT_EXPENSIVE = "Most expensive first";
+    private static final String CATEGORY_PLACEHOLDER = "Category";
+
+    /** id of the category (or subcategory) currently selected in the flyout menu, or null for "all". */
+    private Long selectedCategoryId;
 
     /**
      * called by javafx after fxml loading. sets up the welcome message,
@@ -59,24 +63,80 @@ public class HomeController {
 
         sortBox.setItems(FXCollections.observableArrayList(SORT_NEWEST, SORT_CHEAPEST, SORT_EXPENSIVE));
 
-        loadFilterOptions();
+        loadCityFilterOptions();
+        loadCategoryMenu();
         loadAds();
     }
 
-    private void loadFilterOptions() {
-        try {
-            List<Category> categories = ApiClient.getCategories();
-            categoryFilterBox.setItems(FXCollections.observableArrayList(categories));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    private void loadCityFilterOptions() {
         try {
             List<City> cities = ApiClient.getCities();
             cityFilterBox.setItems(FXCollections.observableArrayList(cities));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * builds the category flyout menu: top-level categories that have
+     * subcategories become a Menu whose children fly out to the side on
+     * hover; leaf categories become a plain, directly-clickable MenuItem.
+     * an "All categories" item at the top clears the filter.
+     */
+    private void loadCategoryMenu() {
+        categoryMenuButton.getItems().clear();
+
+        MenuItem allItem = new MenuItem("All categories");
+        allItem.setOnAction(e -> selectCategory(null, CATEGORY_PLACEHOLDER));
+        categoryMenuButton.getItems().add(allItem);
+        categoryMenuButton.getItems().add(new SeparatorMenuItem());
+
+        try {
+            List<Category> categories = ApiClient.getCategories();
+            for (Category category : categories) {
+                categoryMenuButton.getItems().add(buildCategoryMenuItem(category));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Could not load categories: " + e.getMessage());
+        }
+    }
+
+    /**
+     * builds a single top-level menu entry: a leaf MenuItem if the category
+     * has no children, or a Menu (JavaFX automatically shows its children as
+     * a flyout submenu when the user hovers over it) if it does.
+     */
+    private MenuItem buildCategoryMenuItem(Category category) {
+        if (!category.isHasChildren()) {
+            MenuItem item = new MenuItem(category.getName());
+            item.setOnAction(e -> selectCategory(category.getId(), category.getName()));
+            return item;
+        }
+
+        Menu categoryMenu = new Menu(category.getName());
+
+        MenuItem wholeCategoryItem = new MenuItem("All " + category.getName());
+        wholeCategoryItem.setOnAction(e -> selectCategory(category.getId(), category.getName()));
+        categoryMenu.getItems().add(wholeCategoryItem);
+        categoryMenu.getItems().add(new SeparatorMenuItem());
+
+        try {
+            for (Category sub : ApiClient.getSubcategories(category.getId())) {
+                MenuItem subItem = new MenuItem(sub.getName());
+                subItem.setOnAction(e -> selectCategory(sub.getId(), category.getName() + " \u203a " + sub.getName()));
+                categoryMenu.getItems().add(subItem);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return categoryMenu;
+    }
+
+    private void selectCategory(Long categoryId, String buttonLabel) {
+        selectedCategoryId = categoryId;
+        categoryMenuButton.setText(buttonLabel);
     }
 
     /**
@@ -119,8 +179,9 @@ public class HomeController {
         ApiClient.AdFilter filter = new ApiClient.AdFilter();
         filter.keyword = searchField.getText();
 
-        Category category = categoryFilterBox.getValue();
-        if (category != null) filter.categoryId = category.getId();
+        if (selectedCategoryId != null) {
+            filter.categoryId = selectedCategoryId;
+        }
 
         City city = cityFilterBox.getValue();
         if (city != null) filter.cityId = city.getId();
@@ -161,7 +222,8 @@ public class HomeController {
     @FXML
     private void handleClearFilters() {
         searchField.clear();
-        categoryFilterBox.getSelectionModel().clearSelection();
+        selectedCategoryId = null;
+        categoryMenuButton.setText(CATEGORY_PLACEHOLDER);
         cityFilterBox.getSelectionModel().clearSelection();
         minPriceField.clear();
         maxPriceField.clear();

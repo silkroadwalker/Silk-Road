@@ -180,8 +180,25 @@ public class ApiClient {
     }
 
     public static void createCategory(String name) throws Exception {
+        createCategory(name, null);
+    }
+
+    /**
+     * create a category, optionally as a subcategory of an existing
+     * top-level category.
+     *
+     * @param name     the category name
+     * @param parentId id of the parent (top-level) category, or null to
+     *                 create a new top-level category
+     * @throws Exception if the request fails (e.g. duplicate name, or
+     *                    parentId does not refer to a top-level category)
+     */
+    public static void createCategory(String name, Long parentId) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("name", name);
+        if (parentId != null) {
+            body.addProperty("parentId", parentId);
+        }
 
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/api/categories"))
                 .header("Authorization", "Bearer " + Session.getToken())
