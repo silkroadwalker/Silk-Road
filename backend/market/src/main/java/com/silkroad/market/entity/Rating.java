@@ -4,14 +4,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Id;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.persistence.GenerationType;
 
 @Entity
 @Table(name = "ratings", uniqueConstraints = @UniqueConstraint(columnNames = { "advertisement_id", "buyer_id" }))
@@ -82,5 +81,9 @@ public class Rating {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
