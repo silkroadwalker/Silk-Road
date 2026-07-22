@@ -82,65 +82,53 @@ through the Sign Up screen:
 ### Authentication
 Sign up and login with backend-side validation, and storing the received JWT token.
 
-`![Login screen](docs/screenshots/login.png)`
-> ![img.png](img.png)
+> ![img.png](../docs/images/img.png)
 
-`![Sign up screen](docs/screenshots/signup.png)`
-> ![img_1.png](img_1.png)
+> ![img_1.png](../docs/images/img_1.png)
 
 ### Browsing and Searching Ads (Home)
 Displays approved ads in a grid, with keyword search and sorting.
 
-`![Home screen](docs/screenshots/home.png)`
-> ![img_12.png](img_12.png)
+> ![img_12.png](../docs/images/img_12.png)
 
 ### Creating an Ad
 Form for creating a new ad, with category (and subcategory), city, price, description, and multiple image uploads.
 
-`![Create Ad screen](docs/screenshots/create-ad.png)`
-> ![img_3.png](img_3.png)
+> ![img_3.png](../docs/images/img_3.png)
 
 ### Editing an Ad
 Lets users edit their own ads.
 
-`![Edit Ad screen](docs/screenshots/edit-ad.png)`
-> ![img_4.png](img_4.png)
+> ![img_4.png](../docs/images/img_4.png)
 
 ### Ad Details
 Full view of a single ad, including images, seller info, seller rating, and buttons to start a chat / add to favorites.
 
-`![Ad Details screen](docs/screenshots/ad-details.png)`
-> ![img_5.png](img_5.png)
+>![img_5.png](../docs/images/img_5.png)
 
 ### My Ads
 List of ads posted by the logged-in user, with status (Pending/Approved/Rejected/Sold).
 
-`![My Ads screen](docs/screenshots/my-ads.png)`
-> ![img_6.png](img_6.png)
+> ![img_6.png](../docs/images/img_6.png)
 
 ### Favorites
 List of ads the user has added to favorites.
 
-`![Favorites screen](docs/screenshots/favorites.png)`
-> ![img_7.png](img_7.png)
+> ![img_7.png](../docs/images/img_7.png)
 
 ### Chat with Seller
 List of conversations, and a chat screen for sending/receiving messages between buyer and seller.
 
-`![Conversations list](docs/screenshots/conversations.png)`
-> ![img_8.png](img_8.png)
+> ![img_8.png](../docs/images/img_8.png)
 
-`![Chat screen](docs/screenshots/chat-detail.png)`
-> ![img_9.png](img_9.png)
+> ![img_9.png](../docs/images/img_9.png)
 
 ### Rating a Seller
 Lets a user leave a rating and comment for a seller after a deal, and shows those ratings on the seller's profile/ad details.
 
-`![Rating section](docs/screenshots/rating.png)`
-> ![img_10.png](img_10.png)
+> ![img_10.png](../docs/images/img_10.png)
 
 ### Admin Panel
 Lets an admin review pending ads and approve/reject them.
 
-`![Admin panel](docs/screenshots/admin.png)`
->![img_13.png](img_13.png)
+>![img_13.png](../docs/images/img_13.png)
