@@ -165,12 +165,16 @@
                         <VBox spacing="8">
                             <padding><Insets top="10" right="12" bottom="12" left="12"/></padding>
                             <TextField fx:id="categoryNameField" promptText="Category name"/>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <ComboBox fx:id="parentCategoryBox" promptText="Sub category" prefWidth="320"/>
+                                <Button text="Clear" onAction="#handleClearParentSelection"/>
+                            </HBox>
                             <HBox spacing="10">
                                 <Button text="Add" onAction="#handleAddCategory" styleClass="primary-button"/>
                                 <Button text="Rename Selected" onAction="#handleRenameCategory"/>
                                 <Button text="Delete Selected" onAction="#handleDeleteCategory" styleClass="danger-button"/>
                             </HBox>
-                            <Label fx:id="categoryStatusLabel" styleClass="empty-state"/>
+                            <Label fx:id="categoryStatusLabel" styleClass="empty-state" wrapText="true"/>
                         </VBox>
                     </bottom>
                 </BorderPane>

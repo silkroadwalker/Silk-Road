@@ -1,6 +1,7 @@
 package com.silkroad.market.specification;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -32,9 +33,14 @@ public class AdvertisementSpecifications {
         };
     }
 
-    public static Specification<Advertisement> categoryIs(Long categoryId) {
+    /**
+     * matches ads whose category id is any of the given ids. used so that
+     * filtering by a top-level category (e.g. "Real Estate") also returns
+     * ads posted under its subcategories (e.g. "House", "Apartment").
+     */
+    public static Specification<Advertisement> categoryIn(List<Long> categoryIds) {
 
-        return (root, query, cb) -> cb.equal(root.get("category").get("id"), categoryId);
+        return (root, query, cb) -> root.get("category").get("id").in(categoryIds);
     }
 
     public static Specification<Advertisement> cityIs(Long cityId) {

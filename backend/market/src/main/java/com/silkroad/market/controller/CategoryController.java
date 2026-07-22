@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.silkroad.market.dto.category.CategoryResponse;
 import com.silkroad.market.dto.category.CreateCategoryRequest;
-import com.silkroad.market.entity.Category;
 import com.silkroad.market.service.CategoryService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,28 +32,39 @@ public class CategoryController {
 
     @PostMapping
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Category> createCategory(
+    public ResponseEntity<CategoryResponse> createCategory(
             @Valid @RequestBody CreateCategoryRequest request) {
 
-        Category category = categoryService.createCategory(request);
+        CategoryResponse category = categoryService.createCategory(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(category);
     }
 
+    /**
+     * returns only top-level categories. use {@link #getSubcategories} to
+     * fetch a specific category's children.
+     */
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
+    @GetMapping("/{id}/subcategories")
+    public ResponseEntity<List<CategoryResponse>> getSubcategories(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(categoryService.getSubcategories(id));
     }
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Category> updateCategory(
+    public ResponseEntity<CategoryResponse> updateCategory(
             @PathVariable Long id,
             @Valid @RequestBody CreateCategoryRequest request) {
 
-        Category category = categoryService.updateCategory(id, request);
+        CategoryResponse category = categoryService.updateCategory(id, request);
 
         return ResponseEntity.ok(category);
     }

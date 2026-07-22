@@ -1,6 +1,7 @@
 package com.silkroad.market.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -43,12 +44,12 @@ public class AdvertisementService {
         private final RatingRepository ratingRepository;
 
         public AdvertisementService(
-                        AdvertisementRepository advertisementRepository,
-                        CategoryRepository categoryRepository,
-                        CityRepository cityRepository,
-                        UserRepository userRepository,
-                        ImageStorageService imageStorageService,
-                        RatingRepository ratingRepository) {
+                AdvertisementRepository advertisementRepository,
+                CategoryRepository categoryRepository,
+                CityRepository cityRepository,
+                UserRepository userRepository,
+                ImageStorageService imageStorageService,
+                RatingRepository ratingRepository) {
 
                 this.advertisementRepository = advertisementRepository;
                 this.categoryRepository = categoryRepository;
@@ -68,21 +69,21 @@ public class AdvertisementService {
         // two image files remain on disk.
         @Transactional
         public Advertisement createAdvertisement(
-                        CreateAdvertisementRequest request,
-                        String username) throws IOException {
+                CreateAdvertisementRequest request,
+                String username) throws IOException {
 
                 List<MultipartFile> images = request.getImages();
 
                 User seller = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
                 Category category = categoryRepository.findById(request.getCategoryId())
-                                .orElseThrow(() -> new ApiException("Category not found", HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException("Category not found", HttpStatus.NOT_FOUND));
 
                 City city = cityRepository.findById(request.getCityId())
-                                .orElseThrow(() -> new ApiException(
-                                                "City not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "City not found",
+                                HttpStatus.NOT_FOUND));
 
                 Advertisement advertisement = new Advertisement();
 
@@ -117,50 +118,66 @@ public class AdvertisementService {
         }
 
         public List<AdvertisementSummaryResponse> searchAdvertisements(
-                        AdvertisementSearchRequest request) {
+                AdvertisementSearchRequest request) {
 
                 Specification<Advertisement> specification = AdvertisementSpecifications.approved();
 
                 if (request.getKeyword() != null &&
-                                !request.getKeyword().isBlank()) {
+                        !request.getKeyword().isBlank()) {
 
                         specification = specification.and(
-                                        AdvertisementSpecifications.titleOrDescriptionContains(
-                                                        request.getKeyword()));
+                                AdvertisementSpecifications.titleOrDescriptionContains(
+                                        request.getKeyword()));
                 }
 
                 if (request.getCategoryId() != null) {
 
                         specification = specification.and(
-                                        AdvertisementSpecifications.categoryIs(
-                                                        request.getCategoryId()));
+                                AdvertisementSpecifications.categoryIn(
+                                        resolveCategoryIdsForFilter(request.getCategoryId())));
                 }
 
                 if (request.getCityId() != null) {
 
                         specification = specification.and(
-                                        AdvertisementSpecifications.cityIs(
-                                                        request.getCityId()));
+                                AdvertisementSpecifications.cityIs(
+                                        request.getCityId()));
                 }
 
                 if (request.getMinPrice() != null) {
 
                         specification = specification.and(
-                                        AdvertisementSpecifications.minPrice(
-                                                        request.getMinPrice()));
+                                AdvertisementSpecifications.minPrice(
+                                        request.getMinPrice()));
                 }
 
                 if (request.getMaxPrice() != null) {
 
                         specification = specification.and(
-                                        AdvertisementSpecifications.maxPrice(
-                                                        request.getMaxPrice()));
+                                AdvertisementSpecifications.maxPrice(
+                                        request.getMaxPrice()));
                 }
 
                 return advertisementRepository.findAll(specification)
-                                .stream()
-                                .map(this::toSummaryResponse)
-                                .toList();
+                        .stream()
+                        .map(this::toSummaryResponse)
+                        .toList();
+        }
+
+        /**
+         * expands a category filter into the ids to actually match against:
+         * the category itself, plus its subcategory ids if it's a top-level
+         * category with children. leaf/subcategory ids are returned unchanged.
+         */
+        private List<Long> resolveCategoryIdsForFilter(Long categoryId) {
+
+                List<Long> ids = new ArrayList<>();
+                ids.add(categoryId);
+
+                categoryRepository.findByParentId(categoryId)
+                        .forEach(subcategory -> ids.add(subcategory.getId()));
+
+                return ids;
         }
 
         // public AdvertisementDetailedResponse getAdvertisementDetails(Long id) {
@@ -192,34 +209,34 @@ public class AdvertisementService {
         // }
 
         public AdvertisementDetailedResponse getAdvertisementDetails(
-                        Long id,
-                        AdvertisementStatus requiredStatus,
-                        Authentication authentication) {
+                Long id,
+                AdvertisementStatus requiredStatus,
+                Authentication authentication) {
 
                 Advertisement ad = advertisementRepository.findById(id)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
 
                 boolean isSubmitter = false;
 
                 if (authentication != null) {
 
                         isSubmitter = ad.getSeller()
-                                        .getUsername()
-                                        .equals(authentication.getName());
+                                .getUsername()
+                                .equals(authentication.getName());
                 }
 
                 if (ad.getStatus() != requiredStatus && requiredStatus != null) {
                         throw new ApiException(
-                                        "Advertisement not found",
-                                        HttpStatus.NOT_FOUND);
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND);
                 }
 
                 List<String> imageUrls = ad.getImages()
-                                .stream()
-                                .map(image -> "/api/ads/images/" + image.getId())
-                                .toList();
+                        .stream()
+                        .map(image -> "/api/ads/images/" + image.getId())
+                        .toList();
 
                 Double averageRating = ratingRepository.averageScoreBySeller(ad.getSeller());
 
@@ -228,19 +245,19 @@ public class AdvertisementService {
                 }
 
                 AdvertisementDetailedResponse adDetailedResponse = new AdvertisementDetailedResponse(
-                                ad.getId(),
-                                ad.getTitle(),
-                                ad.getDescription(),
-                                ad.getPrice(),
-                                ad.getSeller().getUsername(),
-                                ad.getSeller().getFullName(),
-                                ad.getSeller().getPhone(),
-                                ad.getCategory().getName(),
-                                ad.getCity().getName(),
-                                ad.getStatus(),
-                                ad.getRejectionReason(),
-                                ad.getCreatedAt(),
-                                imageUrls);
+                        ad.getId(),
+                        ad.getTitle(),
+                        ad.getDescription(),
+                        ad.getPrice(),
+                        ad.getSeller().getUsername(),
+                        ad.getSeller().getFullName(),
+                        ad.getSeller().getPhone(),
+                        ad.getCategory().getName(),
+                        ad.getCity().getName(),
+                        ad.getStatus(),
+                        ad.getRejectionReason(),
+                        ad.getCreatedAt(),
+                        imageUrls);
                 adDetailedResponse.setSubmitter(isSubmitter);
                 adDetailedResponse.setAverageRating(averageRating);
 
@@ -248,12 +265,12 @@ public class AdvertisementService {
         }
 
         public List<AdvertisementSummaryResponse> getAdvertisementsByStatus(
-                        AdvertisementStatus status) {
+                AdvertisementStatus status) {
 
                 return advertisementRepository.findByStatus(status)
-                                .stream()
-                                .map(this::toSummaryResponse)
-                                .toList();
+                        .stream()
+                        .map(this::toSummaryResponse)
+                        .toList();
         }
 
         private AdvertisementSummaryResponse toSummaryResponse(Advertisement ad) {
@@ -265,27 +282,27 @@ public class AdvertisementService {
                 }
 
                 return new AdvertisementSummaryResponse(
-                                ad.getId(),
-                                ad.getTitle(),
-                                ad.getPrice(),
-                                ad.getSeller().getUsername(),
-                                ad.getCategory().getName(),
-                                ad.getCity().getName(),
-                                ad.getStatus(),
-                                thumbnailUrl);
+                        ad.getId(),
+                        ad.getTitle(),
+                        ad.getPrice(),
+                        ad.getSeller().getUsername(),
+                        ad.getCategory().getName(),
+                        ad.getCity().getName(),
+                        ad.getStatus(),
+                        thumbnailUrl);
         }
 
         public void approveAdvertisement(Long id) {
 
                 Advertisement advertisement = advertisementRepository.findById(id)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
 
                 if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
                         throw new ApiException(
-                                        "Advertisement has already been reviewed",
-                                        HttpStatus.BAD_REQUEST);
+                                "Advertisement has already been reviewed",
+                                HttpStatus.BAD_REQUEST);
                 }
 
                 advertisement.setStatus(AdvertisementStatus.APPROVED);
@@ -295,18 +312,18 @@ public class AdvertisementService {
         }
 
         public void rejectAdvertisement(
-                        Long id,
-                        RejectAdvertisementRequest request) {
+                Long id,
+                RejectAdvertisementRequest request) {
 
                 Advertisement advertisement = advertisementRepository.findById(id)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
 
                 if (advertisement.getStatus() != AdvertisementStatus.PENDING) {
                         throw new ApiException(
-                                        "Advertisement has already been reviewed",
-                                        HttpStatus.BAD_REQUEST);
+                                "Advertisement has already been reviewed",
+                                HttpStatus.BAD_REQUEST);
                 }
 
                 advertisement.setStatus(AdvertisementStatus.REJECTED);
@@ -319,21 +336,21 @@ public class AdvertisementService {
         }
 
         private Advertisement getOwnedAdvertisement(
-                        Long id,
-                        String username) {
+                Long id,
+                String username) {
 
                 Advertisement advertisement = advertisementRepository.findById(id)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
 
                 if (!advertisement.getSeller()
-                                .getUsername()
-                                .equals(username)) {
+                        .getUsername()
+                        .equals(username)) {
 
                         throw new ApiException(
-                                        "Access denied",
-                                        HttpStatus.FORBIDDEN);
+                                "Access denied",
+                                HttpStatus.FORBIDDEN);
                 }
 
                 return advertisement;
@@ -341,10 +358,10 @@ public class AdvertisementService {
 
         @Transactional
         public void updateAdvertisement(
-                        // todo: enable image edit
-                        Long id,
-                        UpdateAdvertisementRequest request,
-                        String username) {
+                // todo: enable image edit
+                Long id,
+                UpdateAdvertisementRequest request,
+                String username) {
 
                 Advertisement advertisement = getOwnedAdvertisement(id, username);
 
@@ -361,9 +378,9 @@ public class AdvertisementService {
 
                         Category category = categoryRepository.findById(
                                         request.getCategoryId())
-                                        .orElseThrow(() -> new ApiException(
-                                                        "Category not found",
-                                                        HttpStatus.NOT_FOUND));
+                                .orElseThrow(() -> new ApiException(
+                                        "Category not found",
+                                        HttpStatus.NOT_FOUND));
 
                         advertisement.setCategory(category);
                 }
@@ -372,9 +389,9 @@ public class AdvertisementService {
 
                         City city = cityRepository.findById(
                                         request.getCityId())
-                                        .orElseThrow(() -> new ApiException(
-                                                        "City not found",
-                                                        HttpStatus.NOT_FOUND));
+                                .orElseThrow(() -> new ApiException(
+                                        "City not found",
+                                        HttpStatus.NOT_FOUND));
 
                         advertisement.setCity(city);
                 }
@@ -384,8 +401,8 @@ public class AdvertisementService {
 
         @Transactional
         public void updateAdvertisementStatusToSold(
-                        Long id,
-                        String username) {
+                Long id,
+                String username) {
 
                 Advertisement advertisement = getOwnedAdvertisement(id, username);
 
@@ -396,8 +413,8 @@ public class AdvertisementService {
 
         @Transactional
         public void deleteAdvertisement(
-                        Long id,
-                        String username) {
+                Long id,
+                String username) {
 
                 Advertisement advertisement = getOwnedAdvertisement(id, username);
 
@@ -406,26 +423,26 @@ public class AdvertisementService {
 
         @Transactional
         public void rateAdvertisement(
-                        Long advertisementId,
-                        CreateRatingRequest request,
-                        String username) {
+                Long advertisementId,
+                CreateRatingRequest request,
+                String username) {
 
                 Advertisement advertisement = advertisementRepository.findById(advertisementId)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
 
                 User buyer = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new ApiException(
-                                                "User not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "User not found",
+                                HttpStatus.NOT_FOUND));
 
                 User seller = advertisement.getSeller();
 
                 if (seller.getId().equals(buyer.getId())) {
                         throw new ApiException(
-                                        "You cannot rate yourself",
-                                        HttpStatus.BAD_REQUEST);
+                                "You cannot rate yourself",
+                                HttpStatus.BAD_REQUEST);
                 }
 
                 // optional: u might want Only sold advertisements can be rated
@@ -437,8 +454,8 @@ public class AdvertisementService {
 
                 if (ratingRepository.existsByAdvertisementAndBuyer(advertisement, buyer)) {
                         throw new ApiException(
-                                        "You have already rated this advertisement",
-                                        HttpStatus.BAD_REQUEST);
+                                "You have already rated this advertisement",
+                                HttpStatus.BAD_REQUEST);
                 }
 
                 Rating rating = new Rating();
@@ -456,25 +473,25 @@ public class AdvertisementService {
         public void addFavorite(Long advertisementId, String username) {
 
                 User user = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new ApiException(
-                                                "User not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "User not found",
+                                HttpStatus.NOT_FOUND));
 
                 Advertisement advertisement = advertisementRepository.findById(advertisementId)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
 
                 if (advertisement.getStatus() != AdvertisementStatus.APPROVED) {
                         throw new ApiException(
-                                        "Advertisement not found",
-                                        HttpStatus.NOT_FOUND);
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND);
                 }
 
                 if (user.getFavoriteAdvertisements().contains(advertisement)) {
                         throw new ApiException(
-                                        "Advertisement is already in favorites",
-                                        HttpStatus.BAD_REQUEST);
+                                "Advertisement is already in favorites",
+                                HttpStatus.BAD_REQUEST);
                 }
 
                 user.getFavoriteAdvertisements().add(advertisement);
@@ -486,14 +503,14 @@ public class AdvertisementService {
         public void removeFavorite(Long advertisementId, String username) {
 
                 User user = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new ApiException(
-                                                "User not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "User not found",
+                                HttpStatus.NOT_FOUND));
 
                 Advertisement advertisement = advertisementRepository.findById(advertisementId)
-                                .orElseThrow(() -> new ApiException(
-                                                "Advertisement not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "Advertisement not found",
+                                HttpStatus.NOT_FOUND));
 
                 user.getFavoriteAdvertisements().remove(advertisement);
 
@@ -503,21 +520,21 @@ public class AdvertisementService {
         public List<AdvertisementSummaryResponse> getFavorites(String username) {
 
                 User user = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new ApiException(
-                                                "User not found",
-                                                HttpStatus.NOT_FOUND));
+                        .orElseThrow(() -> new ApiException(
+                                "User not found",
+                                HttpStatus.NOT_FOUND));
 
                 return user.getFavoriteAdvertisements()
-                                .stream()
-                                .map(this::toSummaryResponse)
-                                .toList();
+                        .stream()
+                        .map(this::toSummaryResponse)
+                        .toList();
         }
 
         public List<AdvertisementSummaryResponse> getMyAdvertisements(String username) {
 
                 return advertisementRepository.findBySellerUsername(username)
-                                .stream()
-                                .map(this::toSummaryResponse)
-                                .toList();
+                        .stream()
+                        .map(this::toSummaryResponse)
+                        .toList();
         }
 }

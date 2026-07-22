@@ -754,6 +754,41 @@
     -fx-background-color: rgba(74,144,217,0.15);
     -fx-text-fill: #4A90D9;
 }
+
+/* Parent-category picker (Categories tab) - the plain .combo-box rule
+   elsewhere in this file is white, which stands out against the dark
+   admin panel, so give it the same dark treatment as .admin-dash .text-field. */
+.admin-dash .combo-box {
+    -fx-background-color: #171F1B;
+    -fx-text-fill: #E7ECE7;
+    -fx-border-color: #232D27;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.admin-dash .combo-box .list-cell {
+    -fx-background-color: #171F1B;
+    -fx-text-fill: #E7ECE7;
+}
+
+.admin-dash .combo-box .arrow {
+    -fx-background-color: #7C8A7E;
+}
+
+.admin-dash .combo-box:hover {
+    -fx-border-color: #34D399;
+}
+
+.admin-dash .combo-box:focused,
+.admin-dash .combo-box:showing {
+    -fx-border-color: #34D399;
+}
+
+/* Note: the dropdown list that pops open when the combo box is clicked
+   renders in a separate popup window that JavaFX does not let us scope
+   under ".admin-dash" with plain CSS, so that part still uses the app's
+   normal light popup style (.combo-box-popup further up this file). The
+   box itself, which is what's visible while the panel is idle, is now dark. */
 /* =====================================================================
    ADMIN — SIDEBAR NAV (replaces the old rotated TabPane approach)
    Delete the old ".tab-pane" / ".tab" rules from the previous CSS block
@@ -898,5 +933,66 @@
 }
 
 .home-page .ad-card-price {
+    -fx-text-fill: #2E9E6D;
+}
+
+/* Category flyout MenuButton (home filter bar) */
+.home-page .home-filter-bar .category-menu-button {
+    -fx-background-color: #E4F5EC;
+    -fx-text-fill: #2E9E6D;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #BEE6D2;
+    -fx-border-width: 1.5px;
+    -fx-font-weight: 700;
+    -fx-font-size: 12.5px;
+    -fx-mark-color: #2E9E6D;
+}
+
+.home-page .home-filter-bar .category-menu-button .label {
+    -fx-text-fill: #2E9E6D;
+}
+
+.home-page .home-filter-bar .category-menu-button .arrow {
+    -fx-background-color: #2E9E6D;
+}
+
+.home-page .home-filter-bar .category-menu-button:hover,
+.home-page .home-filter-bar .category-menu-button:showing,
+.home-page .home-filter-bar .category-menu-button:focused {
+    -fx-background-color: #D2EEDF;
+    -fx-border-color: #2E9E6D;
+}
+
+/* Popup menu shared by the category MenuButton (top-level items + the
+   flyout submenus for subcategories). Popups render outside the
+   ".home-page" node, so these rules are intentionally unscoped, the
+   same way the app's existing .combo-box-popup rules are. */
+.context-menu {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E4E1D6;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px;
+}
+
+.menu-item .label,
+.menu .label {
+    -fx-text-fill: #2C3327;
+    -fx-font-size: 12.5px;
+}
+
+.menu-item:focused,
+.menu-item:hover,
+.menu:focused,
+.menu:showing {
+    -fx-background-color: #E4ECDD;
+    -fx-background-radius: 6px;
+}
+
+.menu-item:focused .label,
+.menu-item:hover .label,
+.menu:focused .label,
+.menu:showing .label {
     -fx-text-fill: #2E9E6D;
 }

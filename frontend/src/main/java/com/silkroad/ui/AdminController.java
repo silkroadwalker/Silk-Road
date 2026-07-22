@@ -54,6 +54,8 @@ public class AdminController {
     @FXML
     private TextField categoryNameField;
     @FXML
+    private ComboBox<Category> parentCategoryBox;
+    @FXML
     private Label categoryStatusLabel;
 
     @FXML
@@ -86,9 +88,25 @@ public class AdminController {
             @Override
             protected void updateItem(Category category, boolean empty) {
                 super.updateItem(category, empty);
+                if (empty || category == null) {
+                    setText(null);
+                } else if (category.getParentId() != null) {
+                    setText("      \u21b3 " + category.getName());
+                } else {
+                    setText(category.getName() + (category.isHasChildren() ? "  (has subcategories)" : ""));
+                }
+            }
+        });
+
+        parentCategoryBox.setCellFactory(list -> new ListCell<>() {
+            @Override
+            protected void updateItem(Category category, boolean empty) {
+                super.updateItem(category, empty);
                 setText(empty || category == null ? null : category.getName());
             }
         });
+        parentCategoryBox.setButtonCell(parentCategoryBox.getCellFactory().call(null));
+
         loadCategories();
 
         usersListView.setCellFactory(list -> new ListCell<>() {
@@ -397,16 +415,40 @@ public class AdminController {
     // categories
     // ---------------------------------------------------------------
 
+    /**
+     * loads categories for both the list (top-level categories followed by
+     * their subcategories, indented) and the parent-picker combo box (only
+     * top-level categories, since subcategories can't be nested further).
+     */
     private void loadCategories() {
         try {
-            List<Category> categories = ApiClient.getCategories();
-            categoriesListView.setItems(FXCollections.observableArrayList(categories));
+            List<Category> topLevel = ApiClient.getCategories();
+            List<Category> combined = new ArrayList<>();
+
+            for (Category category : topLevel) {
+                combined.add(category);
+                if (category.isHasChildren()) {
+                    try {
+                        combined.addAll(ApiClient.getSubcategories(category.getId()));
+                    } catch (Exception ignored) {
+                        // that category's subcategories just won't show up in the list
+                    }
+                }
+            }
+
+            categoriesListView.setItems(FXCollections.observableArrayList(combined));
+            parentCategoryBox.setItems(FXCollections.observableArrayList(topLevel));
         } catch (Exception e) {
             categoryStatusLabel.setText("Could not load categories: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    /**
+     * adds a new category. if a parent is selected in the parent-picker,
+     * it's created as a subcategory of that category; otherwise it's a new
+     * top-level category.
+     */
     @FXML
     private void handleAddCategory() {
         String name = categoryNameField.getText();
@@ -414,15 +456,27 @@ public class AdminController {
             categoryStatusLabel.setText("Enter a category name first.");
             return;
         }
+        Category parent = parentCategoryBox.getValue();
         try {
-            ApiClient.createCategory(name);
+            if (parent != null) {
+                ApiClient.createCategory(name, parent.getId());
+                categoryStatusLabel.setText("Subcategory added under \"" + parent.getName() + "\".");
+            } else {
+                ApiClient.createCategory(name);
+                categoryStatusLabel.setText("Category added.");
+            }
             categoryNameField.clear();
-            categoryStatusLabel.setText("Category added.");
+            parentCategoryBox.getSelectionModel().clearSelection();
             loadCategories();
         } catch (Exception e) {
             categoryStatusLabel.setText("Could not add category: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void handleClearParentSelection() {
+        parentCategoryBox.getSelectionModel().clearSelection();
     }
 
     @FXML

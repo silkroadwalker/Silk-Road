@@ -27,7 +27,7 @@
             <HBox spacing="8" alignment="CENTER_LEFT" styleClass="home-filter-bar">
                 <padding><Insets top="0" right="16" bottom="12" left="16"/></padding>
                 <TextField fx:id="searchField" promptText="Search ads..." HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="categoryFilterBox" promptText="Category" prefWidth="130"/>
+                <MenuButton fx:id="categoryMenuButton" text="Category" prefWidth="160" styleClass="category-menu-button"/>
                 <ComboBox fx:id="cityFilterBox" promptText="City" prefWidth="130"/>
                 <TextField fx:id="minPriceField" promptText="Min price" prefWidth="80"/>
                 <TextField fx:id="maxPriceField" promptText="Max price" prefWidth="80"/>
