@@ -18,6 +18,9 @@ public class Category {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    @Column(name = "parent_id")
+    private Long parentId;
+
     public Category() {
     }
 
@@ -35,6 +38,14 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
 }
