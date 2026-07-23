@@ -65,56 +65,56 @@ backend runs on a different port, that value must be changed manually in that fi
 ### Authentication
 Sign up and login with backend-side validation, and storing the received JWT token.
 
-> ![img.png](../docs/images/img.png)
+> ![img.png](docs/images/img.png)
 
-> ![img_1.png](../docs/images/img_1.png)
+> ![img_1.png](docs/images/img_1.png)
 
 ### Browsing and Searching Ads (Home)
 Displays approved ads in a grid, with keyword search and sorting.
 
-> ![img_12.png](../docs/images/img_12.png)
+> ![img_12.png](docs/images/img_12.png)
 
 ### Creating an Ad
 Form for creating a new ad, with category (and subcategory), city, price, description, and multiple image uploads.
 
-> ![img_3.png](../docs/images/img_3.png)
+> ![img_3.png](docs/images/img_3.png)
 
 ### Editing an Ad
 Lets users edit their own ads.
 
-> ![img_4.png](../docs/images/img_4.png)
+> ![img_4.png](docs/images/img_4.png)
 
 ### Ad Details
 Full view of a single ad, including images, seller info, seller rating, and buttons to start a chat / add to favorites.
 
->![img_5.png](../docs/images/img_5.png)
+>![img_5.png](docs/images/img_5.png)
 
 ### My Ads
 List of ads posted by the logged-in user, with status (Pending/Approved/Rejected/Sold).
 
-> ![img_6.png](../docs/images/img_6.png)
+> ![img_6.png](docs/images/img_6.png)
 
 ### Favorites
 List of ads the user has added to favorites.
 
-> ![img_7.png](../docs/images/img_7.png)
+> ![img_7.png](docs/images/img_7.png)
 
 ### Chat with Seller
 List of conversations, and a chat screen for sending/receiving messages between buyer and seller.
 
-> ![img_8.png](../docs/images/img_8.png)
+> ![img_8.png](docs/images/img_8.png)
 
-> ![img_9.png](../docs/images/img_9.png)
+> ![img_9.png](docs/images/img_9.png)
 
 ### Rating a Seller
 Lets a user leave a rating and comment for a seller after a deal, and shows those ratings on the seller's profile/ad details.
 
-> ![img_10.png](../docs/images/img_10.png)
+> ![img_10.png](docs/images/img_10.png)
 
 ### Admin Panel
 Lets an admin review pending ads and approve/reject them.
 
->![img_13.png](../docs/images/img_13.png)
+>![img_13.png](docs/images/img_13.png)
 
 # Backend
 
