@@ -486,6 +486,26 @@ public class ApiClient {
     }
 
     /**
+     * fetch all buyer ratings/reviews left on a specific advertisement.
+     *
+     * @param adId the advertisement id
+     * @return list of ratings (buyer username, score 1-5, optional comment),
+     *         most recent first
+     * @throws Exception if the request fails
+     */
+    public static List<Rating> getAdvertisementRatings(Long adId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/api/ads/" + adId + "/ratings"))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        checkResponse(response, "load ratings");
+        return gson.fromJson(response.body(), new TypeToken<List<Rating>>() {}.getType());
+    }
+
+    /**
      * fetch detailed information for a single ad (including seller info and rating).
      *
      * @param adId the advertisement id
@@ -502,25 +522,6 @@ public class ApiClient {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         checkResponse(response, "get ad details");
         return gson.fromJson(response.body(), AdDetail.class);
-    }
-
-    /**
-     * fetch all buyer ratings/reviews left on a specific advertisement.
-     *
-     * @param adId the advertisement id
-     * @return list of ratings (buyer username, score 1-5, optional comment)
-     * @throws Exception if the request fails
-     */
-    public static List<Rating> getAdvertisementRatings(Long adId) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/api/ads/" + adId + "/ratings"))
-                .header("Authorization", "Bearer " + Session.getToken())
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        checkResponse(response, "load ratings");
-        return gson.fromJson(response.body(), new TypeToken<List<Rating>>() {}.getType());
     }
 
     /**
@@ -591,6 +592,63 @@ public class ApiClient {
         public Long cityId;
         public String minPrice;
         public String maxPrice;
+    }
+
+    /**
+     * search filters for the admin panel's "All Ads" tab. same fields as
+     * {@link AdFilter} plus an optional status to narrow the results to
+     * PENDING/APPROVED/REJECTED/SOLD; leave status null/blank for every status.
+     */
+    public static class AdminAdFilter {
+        public String keyword;
+        public Long categoryId;
+        public Long cityId;
+        public String minPrice;
+        public String maxPrice;
+        public String status;
+    }
+
+    /**
+     * admin-only search across advertisements of any status (pending,
+     * approved, rejected, sold) with the same filters as the public home
+     * search. deleted ads are hard-deleted on the backend, so they never
+     * appear in this list.
+     *
+     * @param filter the search criteria, including optional status
+     * @return list of matching ads
+     * @throws Exception if the request fails
+     */
+    public static List<Ad> adminSearchAds(AdminAdFilter filter) throws Exception {
+        StringBuilder query = new StringBuilder("/api/admin/ads?");
+
+        if (filter.keyword != null && !filter.keyword.isBlank()) {
+            query.append("keyword=").append(URLEncoder.encode(filter.keyword, StandardCharsets.UTF_8)).append("&");
+        }
+        if (filter.categoryId != null) {
+            query.append("categoryId=").append(filter.categoryId).append("&");
+        }
+        if (filter.cityId != null) {
+            query.append("cityId=").append(filter.cityId).append("&");
+        }
+        if (filter.minPrice != null && !filter.minPrice.isBlank()) {
+            query.append("minPrice=").append(URLEncoder.encode(filter.minPrice, StandardCharsets.UTF_8)).append("&");
+        }
+        if (filter.maxPrice != null && !filter.maxPrice.isBlank()) {
+            query.append("maxPrice=").append(URLEncoder.encode(filter.maxPrice, StandardCharsets.UTF_8)).append("&");
+        }
+        if (filter.status != null && !filter.status.isBlank()) {
+            query.append("status=").append(filter.status).append("&");
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + query))
+                .header("Authorization", "Bearer " + Session.getToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        checkResponse(response, "admin search ads");
+        return gson.fromJson(response.body(), new TypeToken<List<Ad>>() {}.getType());
     }
 
     public static void markAdSold(Long adId) throws Exception {

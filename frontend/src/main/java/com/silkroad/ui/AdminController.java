@@ -3,6 +3,7 @@ package com.silkroad.ui;
 import com.silkroad.api.ApiClient;
 import com.silkroad.model.Ad;
 import com.silkroad.model.Category;
+import com.silkroad.model.City;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -13,9 +14,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -44,10 +44,34 @@ public class AdminController {
     @FXML
     private TextField allAdsSearchField;
     @FXML
+    private MenuButton allAdsCategoryMenuButton;
+    @FXML
+    private ComboBox<City> allAdsCityFilterBox;
+    @FXML
+    private TextField allAdsMinPriceField;
+    @FXML
+    private TextField allAdsMaxPriceField;
+    @FXML
+    private ComboBox<String> allAdsSortBox;
+    @FXML
+    private ComboBox<String> allAdsStatusFilterBox;
+    @FXML
     private FlowPane allAdsFlowPane;
     @FXML
     private Label allAdsStatusLabel;
-    private List<Ad> allAdsCache = new ArrayList<>();
+
+    /** id of the category (or subcategory) currently selected in the All Ads flyout menu, or null for "all". */
+    private Long selectedAllAdsCategoryId;
+
+    private static final String CATEGORY_PLACEHOLDER = "Category";
+    private static final String SORT_NEWEST = "Newest first";
+    private static final String SORT_CHEAPEST = "Cheapest first";
+    private static final String SORT_EXPENSIVE = "Most expensive first";
+    private static final String STATUS_ALL = "All statuses";
+    private static final String STATUS_PENDING = "Pending";
+    private static final String STATUS_APPROVED = "Approved";
+    private static final String STATUS_REJECTED = "Rejected";
+    private static final String STATUS_SOLD = "Sold";
 
     @FXML
     private ListView<Category> categoriesListView;
@@ -82,6 +106,14 @@ public class AdminController {
     @FXML
     public void initialize() {
         loadPendingAds();
+
+        allAdsSortBox.setItems(FXCollections.observableArrayList(SORT_NEWEST, SORT_CHEAPEST, SORT_EXPENSIVE));
+        allAdsStatusFilterBox.setItems(FXCollections.observableArrayList(
+                STATUS_ALL, STATUS_PENDING, STATUS_APPROVED, STATUS_REJECTED, STATUS_SOLD));
+        allAdsStatusFilterBox.setValue(STATUS_ALL);
+
+        loadAllAdsCityFilterOptions();
+        loadAllAdsCategoryMenu();
         loadAllAds();
 
         categoriesListView.setCellFactory(list -> new ListCell<>() {
@@ -314,51 +346,91 @@ public class AdminController {
         }
     }
 
-    /**
-     * loads active ads and pending ads into a single cache for admin browsing.
-     * rejected, sold, and deleted ads are not yet retrievable because the
-     * backend does not expose an admin endpoint for them.
-     */
-    private void loadAllAds() {
+    // ---------------------------------------------------------------
+    // all ads
+    // ---------------------------------------------------------------
+
+    private void loadAllAdsCityFilterOptions() {
         try {
-            Map<Long, Ad> byId = new LinkedHashMap<>();
-            for (Ad ad : ApiClient.getAds()) {
-                byId.put(ad.getId(), ad);
-            }
-            try {
-                for (Ad ad : ApiClient.getPendingAds()) {
-                    byId.put(ad.getId(), ad);
-                }
-            } catch (Exception ignored) {
-                // pending ads just won't be included in the combined list
-            }
-            allAdsCache = new ArrayList<>(byId.values());
-            applyAllAdsFilter();
+            List<City> cities = ApiClient.getCities();
+            allAdsCityFilterBox.setItems(FXCollections.observableArrayList(cities));
         } catch (Exception e) {
-            allAdsStatusLabel.setText("Could not load ads: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     /**
-     * filters the cached ads by the search keyword and renders the result.
-     * search is performed on both title and seller username.
+     * builds the category flyout menu for the All Ads tab, mirroring
+     * {@link HomeController}'s category menu: top-level categories with
+     * subcategories become a Menu that flies out on hover, leaf categories
+     * become a plain clickable MenuItem, and "All categories" clears the filter.
      */
-    private void applyAllAdsFilter() {
-        String keyword = allAdsSearchField.getText();
-        List<Ad> filtered = allAdsCache;
-        if (keyword != null && !keyword.isBlank()) {
-            String lower = keyword.toLowerCase();
-            filtered = allAdsCache.stream()
-                    .filter(ad -> (ad.getTitle() != null && ad.getTitle().toLowerCase().contains(lower))
-                            || (ad.getSellerUsername() != null && ad.getSellerUsername().toLowerCase().contains(lower)))
-                    .toList();
+    private void loadAllAdsCategoryMenu() {
+        allAdsCategoryMenuButton.getItems().clear();
+
+        MenuItem allItem = new MenuItem("All categories");
+        allItem.setOnAction(e -> selectAllAdsCategory(null, CATEGORY_PLACEHOLDER));
+        allAdsCategoryMenuButton.getItems().add(allItem);
+        allAdsCategoryMenuButton.getItems().add(new SeparatorMenuItem());
+
+        try {
+            List<Category> categories = ApiClient.getCategories();
+            for (Category category : categories) {
+                allAdsCategoryMenuButton.getItems().add(buildAllAdsCategoryMenuItem(category));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            allAdsStatusLabel.setText("Could not load categories: " + e.getMessage());
         }
-        renderAllAds(filtered);
-        allAdsStatusLabel.setText(filtered.isEmpty()
-                ? "No ads match."
-                : "Showing approved + pending ads (" + filtered.size() + "). "
-                + "Rejected/sold/deleted ads aren't available to admins yet.");
+    }
+
+    private MenuItem buildAllAdsCategoryMenuItem(Category category) {
+        if (!category.isHasChildren()) {
+            MenuItem item = new MenuItem(category.getName());
+            item.setOnAction(e -> selectAllAdsCategory(category.getId(), category.getName()));
+            return item;
+        }
+
+        Menu categoryMenu = new Menu(category.getName());
+
+        MenuItem wholeCategoryItem = new MenuItem("All " + category.getName());
+        wholeCategoryItem.setOnAction(e -> selectAllAdsCategory(category.getId(), category.getName()));
+        categoryMenu.getItems().add(wholeCategoryItem);
+        categoryMenu.getItems().add(new SeparatorMenuItem());
+
+        try {
+            for (Category sub : ApiClient.getSubcategories(category.getId())) {
+                MenuItem subItem = new MenuItem(sub.getName());
+                subItem.setOnAction(e -> selectAllAdsCategory(sub.getId(), category.getName() + " \u203a " + sub.getName()));
+                categoryMenu.getItems().add(subItem);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return categoryMenu;
+    }
+
+    private void selectAllAdsCategory(Long categoryId, String buttonLabel) {
+        selectedAllAdsCategoryId = categoryId;
+        allAdsCategoryMenuButton.setText(buttonLabel);
+    }
+
+    /**
+     * loads every advertisement regardless of status (subject to whatever
+     * filters are currently set). deleted ads are hard-deleted on the
+     * backend, so they never appear here.
+     */
+    private void loadAllAds() {
+        try {
+            List<Ad> ads = ApiClient.adminSearchAds(new ApiClient.AdminAdFilter());
+            ads = applyAllAdsSort(ads);
+            renderAllAds(ads);
+            allAdsStatusLabel.setText(ads.isEmpty() ? "No ads found." : "");
+        } catch (Exception e) {
+            allAdsStatusLabel.setText("Could not load ads: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void renderAllAds(List<Ad> ads) {
@@ -380,18 +452,106 @@ public class AdminController {
         }
     }
 
+    /**
+     * runs a search across advertisements of every status using the current
+     * keyword, category, city, price range, and status filters, then applies
+     * the selected client-side sort order.
+     */
     @FXML
     private void handleAllAdsSearch() {
-        applyAllAdsFilter();
-    }
+        ApiClient.AdminAdFilter filter = new ApiClient.AdminAdFilter();
+        filter.keyword = allAdsSearchField.getText();
 
-    @FXML
-    private void handleRefreshAllAds() {
-        loadAllAds();
+        if (selectedAllAdsCategoryId != null) {
+            filter.categoryId = selectedAllAdsCategoryId;
+        }
+
+        City city = allAdsCityFilterBox.getValue();
+        if (city != null) filter.cityId = city.getId();
+
+        String minPrice = allAdsMinPriceField.getText();
+        String maxPrice = allAdsMaxPriceField.getText();
+
+        if (minPrice != null && !minPrice.isBlank()) {
+            if (!isValidNumber(minPrice)) {
+                allAdsStatusLabel.setText("Min price must be a number.");
+                return;
+            }
+            filter.minPrice = minPrice;
+        }
+        if (maxPrice != null && !maxPrice.isBlank()) {
+            if (!isValidNumber(maxPrice)) {
+                allAdsStatusLabel.setText("Max price must be a number.");
+                return;
+            }
+            filter.maxPrice = maxPrice;
+        }
+
+        filter.status = mapStatusChoice(allAdsStatusFilterBox.getValue());
+
+        try {
+            List<Ad> results = ApiClient.adminSearchAds(filter);
+            results = applyAllAdsSort(results);
+            renderAllAds(results);
+            allAdsStatusLabel.setText(results.isEmpty() ? "No ads match your search." : "");
+        } catch (Exception e) {
+            allAdsStatusLabel.setText("Search failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
-     * deletes an ad from the 'all ads' view after confirmation.
+     * resets all All Ads filter fields (search text, category, city, price
+     * range, status, and sort order) and reloads the full unfiltered list.
+     */
+    @FXML
+    private void handleClearAllAdsFilters() {
+        allAdsSearchField.clear();
+        selectedAllAdsCategoryId = null;
+        allAdsCategoryMenuButton.setText(CATEGORY_PLACEHOLDER);
+        allAdsCityFilterBox.getSelectionModel().clearSelection();
+        allAdsMinPriceField.clear();
+        allAdsMaxPriceField.clear();
+        allAdsSortBox.getSelectionModel().clearSelection();
+        allAdsStatusFilterBox.setValue(STATUS_ALL);
+        loadAllAds();
+    }
+
+    private String mapStatusChoice(String choice) {
+        if (choice == null || STATUS_ALL.equals(choice)) return null;
+        if (STATUS_PENDING.equals(choice)) return "PENDING";
+        if (STATUS_APPROVED.equals(choice)) return "APPROVED";
+        if (STATUS_REJECTED.equals(choice)) return "REJECTED";
+        if (STATUS_SOLD.equals(choice)) return "SOLD";
+        return null;
+    }
+
+    private List<Ad> applyAllAdsSort(List<Ad> ads) {
+        String sort = allAdsSortBox.getValue();
+        if (sort == null) return ads;
+
+        if (SORT_CHEAPEST.equals(sort)) {
+            ads.sort(Comparator.comparingDouble(Ad::getPrice));
+        } else if (SORT_EXPENSIVE.equals(sort)) {
+            ads.sort(Comparator.comparingDouble(Ad::getPrice).reversed());
+        } else if (SORT_NEWEST.equals(sort)) {
+            ads.sort(Comparator.comparing(Ad::getId).reversed());
+        }
+        return ads;
+    }
+
+    private boolean isValidNumber(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * deletes an ad from the 'all ads' view after confirmation, then
+     * re-runs the current search so the list reflects the deletion.
      *
      * @param ad the ad to delete
      */
@@ -402,7 +562,7 @@ public class AdminController {
         try {
             ApiClient.deleteAd(ad.getId());
             allAdsStatusLabel.setText("Ad deleted.");
-            loadAllAds();
+            handleAllAdsSearch();
         } catch (Exception e) {
             allAdsStatusLabel.setText("Could not delete ad: " + e.getMessage());
             e.printStackTrace();

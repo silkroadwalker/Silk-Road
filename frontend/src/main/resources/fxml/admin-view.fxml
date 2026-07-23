@@ -131,10 +131,17 @@
                 <!-- All Ads -->
                 <BorderPane fx:id="allAdsPane" styleClass="page-body" visible="false" managed="false">
                     <top>
-                        <HBox spacing="10" alignment="CENTER_LEFT">
-                            <padding><Insets top="12" right="12" bottom="0" left="12"/></padding>
-                            <TextField fx:id="allAdsSearchField" promptText="Search by title or seller" HBox.hgrow="ALWAYS"/>
+                        <HBox spacing="8" alignment="CENTER_LEFT" styleClass="home-filter-bar">
+                            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                            <TextField fx:id="allAdsSearchField" promptText="Search ads..." HBox.hgrow="ALWAYS"/>
+                            <MenuButton fx:id="allAdsCategoryMenuButton" text="Category" prefWidth="160" styleClass="category-menu-button"/>
+                            <ComboBox fx:id="allAdsCityFilterBox" promptText="City" prefWidth="130"/>
+                            <TextField fx:id="allAdsMinPriceField" promptText="Min price" prefWidth="80"/>
+                            <TextField fx:id="allAdsMaxPriceField" promptText="Max price" prefWidth="80"/>
+                            <ComboBox fx:id="allAdsStatusFilterBox" promptText="Status" prefWidth="130"/>
+                            <ComboBox fx:id="allAdsSortBox" promptText="Sort by" prefWidth="140"/>
                             <Button text="Search" onAction="#handleAllAdsSearch" styleClass="primary-button"/>
+                            <Button text="Clear" onAction="#handleClearAllAdsFilters"/>
                         </HBox>
                     </top>
                     <center>
@@ -146,11 +153,9 @@
                         </ScrollPane>
                     </center>
                     <bottom>
-                        <VBox spacing="8">
-                            <padding><Insets top="10" right="12" bottom="12" left="12"/></padding>
-                            <Button text="Refresh" onAction="#handleRefreshAllAds"/>
-                            <Label fx:id="allAdsStatusLabel" styleClass="empty-state" wrapText="true"/>
-                        </VBox>
+                        <Label fx:id="allAdsStatusLabel" styleClass="empty-state" wrapText="true">
+                            <padding><Insets top="0" right="12" bottom="12" left="12"/></padding>
+                        </Label>
                     </bottom>
                 </BorderPane>
 

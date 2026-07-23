@@ -1,9 +1,8 @@
 package com.silkroad.model;
 
 /**
- * A single buyer rating/review left on an advertisement.
- * Field names mirror the backend's RatingResponse DTO
- * (id, buyerUsername, score, comment) so Gson can map them directly.
+ * a single buyer rating/review left on an advertisement.
+ * mirrors the backend's RatingResponse DTO.
  */
 public class Rating {
     private Long id;
