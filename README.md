@@ -114,7 +114,7 @@ Lets a user leave a rating and comment for a seller after a deal, and shows thos
 ### Admin Panel
 Lets an admin review pending ads and approve/reject them.
 
->![img_13.png](docs/images/img_13.png)
+>![img.png](docs/images/admin.png)
 
 # Backend
 

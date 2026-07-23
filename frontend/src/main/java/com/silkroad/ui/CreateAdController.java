@@ -168,7 +168,7 @@ public class CreateAdController {
         }
 
         try {
-            ApiClient.createAd(title, description, priceText, selectedCategory.getId(), selectedCity.getId(),
+            ApiClient.createAd(title, description, priceText, categoryForAd.getId(), selectedCity.getId(),
                     selectedImages);
             Dialogs.info("Ad created! It will appear once an admin approves it.");
             SceneManager.switchScene("/fxml/home-view.fxml");
