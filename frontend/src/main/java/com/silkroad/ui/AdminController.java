@@ -174,8 +174,7 @@ public class AdminController {
             note.append("Could not load active ads. ");
         }
 
-        note.append("Rejected/sold/deleted ad counts and a reports count aren't shown yet "
-                + "because the backend doesn't expose that data.");
+        note.append("Don't burn yourself out!");
         dashboardNoteLabel.setText(note.toString());
 
         renderDashboardChart(totalUsers, pendingCount, activeCount);
@@ -309,8 +308,7 @@ public class AdminController {
             statusLabel.setText("Ad deleted.");
             loadPendingAds();
         } catch (Exception e) {
-            statusLabel.setText("Could not delete ad. The backend currently only lets an ad's own "
-                    + "seller delete it (needs an admin-delete permission): " + e.getMessage());
+            statusLabel.setText("Could not delete ad: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -405,8 +403,7 @@ public class AdminController {
             allAdsStatusLabel.setText("Ad deleted.");
             loadAllAds();
         } catch (Exception e) {
-            allAdsStatusLabel.setText("Could not delete ad. The backend currently only lets an ad's own "
-                    + "seller delete it (needs an admin-delete permission): " + e.getMessage());
+            allAdsStatusLabel.setText("Could not delete ad: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -7,6 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.silkroad.market.dto.user.UserSummaryResponse;
 import com.silkroad.market.service.UserService;
@@ -39,5 +41,17 @@ public class AdminUserController {
         System.out.println("Authorities: " + authentication.getAuthorities());
 
         return userService.getAllUsers();
+    }
+
+    @PatchMapping("/{id}/block")
+    @SecurityRequirement(name = "bearerAuth")
+    public void blockUser(@PathVariable Long id) {
+        userService.blockUser(id);
+    }
+
+    @PatchMapping("/{id}/unblock")
+    @SecurityRequirement(name = "bearerAuth")
+    public void unblockUser(@PathVariable Long id) {
+        userService.unblockUser(id);
     }
 }
