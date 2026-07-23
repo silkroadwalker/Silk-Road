@@ -4,57 +4,102 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.silkroad.ui.EditAdController"
-            prefWidth="1000" prefHeight="680" styleClass="page-body">
+            prefWidth="1000"
+            prefHeight="680"
+            styleClass="page-body">
 
     <top>
         <HBox spacing="10" alignment="CENTER_LEFT" styleClass="top-bar">
-            <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
-            <Button text="&lt; Back" onAction="#goBack" styleClass="back-button"/>
-            <Label text="Edit Ad" styleClass="page-title"/>
+            <padding>
+                <Insets top="12" right="16" bottom="12" left="16"/>
+            </padding>
+
+            <Button text="&lt; Back"
+                    onAction="#goBack"
+                    styleClass="back-button"/>
+
+            <Label text="Edit Ad"
+                   styleClass="page-title"/>
         </HBox>
     </top>
 
     <center>
         <ScrollPane fitToWidth="true" styleClass="ads-grid-scroll">
             <StackPane>
-                <VBox spacing="14" maxWidth="560" styleClass="detail-card">
-                    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+                <VBox spacing="14"
+                      maxWidth="560"
+                      styleClass="detail-card">
+
+                    <padding>
+                        <Insets top="24" right="24" bottom="24" left="24"/>
+                    </padding>
+
                     <StackPane.margin>
-                        <Insets top="24" left="20" right="20" bottom="24"/>
+                        <Insets top="24" right="20" bottom="24" left="20"/>
                     </StackPane.margin>
 
                     <VBox spacing="6">
                         <Label text="Title" styleClass="field-label"/>
-                        <TextField fx:id="titleField" promptText="Title"/>
+                        <TextField fx:id="titleField"
+                                   promptText="Title"/>
                     </VBox>
 
                     <VBox spacing="6">
                         <Label text="Description" styleClass="field-label"/>
-                        <TextArea fx:id="descriptionField" prefRowCount="4" wrapText="true" promptText="Description"/>
+                        <TextArea fx:id="descriptionField"
+                                  promptText="Description"
+                                  prefRowCount="4"
+                                  wrapText="true"/>
                     </VBox>
 
                     <VBox spacing="6">
                         <Label text="Price" styleClass="field-label"/>
-                        <TextField fx:id="priceField" promptText="Price"/>
+                        <TextField fx:id="priceField"
+                                   promptText="Price"/>
                     </VBox>
 
                     <HBox spacing="14">
+
                         <VBox spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="City" styleClass="field-label"/>
-                            <ComboBox fx:id="cityComboBox" promptText="City" maxWidth="Infinity"/>
+                            <ComboBox fx:id="cityComboBox"
+                                      promptText="City"
+                                      maxWidth="Infinity"/>
                         </VBox>
+
                         <VBox spacing="6" HBox.hgrow="ALWAYS">
                             <Label text="Category" styleClass="field-label"/>
-                            <ComboBox fx:id="categoryComboBox" promptText="Category" maxWidth="Infinity"/>
+                            <ComboBox fx:id="categoryComboBox"
+                                      promptText="Category"
+                                      maxWidth="Infinity"/>
                         </VBox>
+
                     </HBox>
 
-                    <Label fx:id="statusLabel" styleClass="status-label" wrapText="true"/>
+                    <VBox spacing="6">
+                        <Label text="Subcategory" styleClass="field-label"/>
+                        <ComboBox fx:id="subCategoryComboBox"
+                                  promptText="Subcategory"
+                                  maxWidth="Infinity"
+                                  disable="true"/>
+                    </VBox>
 
-                    <Button fx:id="submitButton" onAction="#handleSave" text="Save Changes" styleClass="primary-button" maxWidth="Infinity"/>
+                    <Label fx:id="statusLabel"
+                           styleClass="status-label"
+                           wrapText="true"/>
+
+                    <Button fx:id="submitButton"
+                            text="Save Changes"
+                            onAction="#handleSave"
+                            styleClass="primary-button"
+                            maxWidth="Infinity"/>
+
                 </VBox>
+
             </StackPane>
         </ScrollPane>
     </center>
