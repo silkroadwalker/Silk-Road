@@ -43,6 +43,15 @@ public class AdvertisementSpecifications {
         return (root, query, cb) -> root.get("category").get("id").in(categoryIds);
     }
 
+    /**
+     * matches ads with the given status exactly. used by the admin panel
+     * to filter between pending / approved / rejected / sold ads.
+     */
+    public static Specification<Advertisement> statusIs(AdvertisementStatus status) {
+
+        return (root, query, cb) -> cb.equal(root.get("status"), status);
+    }
+
     public static Specification<Advertisement> cityIs(Long cityId) {
 
         return (root, query, cb) -> cb.equal(root.get("city").get("id"), cityId);

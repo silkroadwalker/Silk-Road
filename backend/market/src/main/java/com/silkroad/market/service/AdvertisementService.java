@@ -120,9 +120,52 @@ public class AdvertisementService {
         public List<AdvertisementSummaryResponse> searchAdvertisements(
                 AdvertisementSearchRequest request) {
 
-                Specification<Advertisement> specification = AdvertisementSpecifications.approved();
+                Specification<Advertisement> specification = AdvertisementSpecifications.approved()
+                        .and(buildFilterSpecification(request));
 
-                if (request.getKeyword() != null &&
+                return advertisementRepository.findAll(specification)
+                        .stream()
+                        .map(this::toSummaryResponse)
+                        .toList();
+        }
+
+        /**
+         * admin-only search across advertisements of any status (or a single
+         * given status), using the same keyword/category/city/price filters
+         * as the public search. deleted advertisements are hard-deleted from
+         * the database, so they never show up here or anywhere else.
+         *
+         * @param request the shared keyword/category/city/price filters
+         * @param status  restrict to a single status (PENDING/APPROVED/REJECTED/SOLD),
+         *                or null to include ads of every status
+         */
+        public List<AdvertisementSummaryResponse> adminSearchAdvertisements(
+                AdvertisementSearchRequest request,
+                AdvertisementStatus status) {
+
+                Specification<Advertisement> specification = buildFilterSpecification(request);
+
+                if (status != null) {
+
+                        specification = specification.and(
+                                AdvertisementSpecifications.statusIs(status));
+                }
+
+                return advertisementRepository.findAll(specification)
+                        .stream()
+                        .map(this::toSummaryResponse)
+                        .toList();
+        }
+
+        /**
+         * builds the keyword/category/city/price portion of a search
+         * specification, shared between the public and admin searches.
+         * does not apply any status restriction.
+         */
+        private Specification<Advertisement> buildFilterSpecification(
+                AdvertisementSearchRequest request) {
+
+                Specification<Advertisement> specification = Specification.where((Specification<Advertisement>) null);                if (request.getKeyword() != null &&
                         !request.getKeyword().isBlank()) {
 
                         specification = specification.and(
@@ -158,10 +201,7 @@ public class AdvertisementService {
                                         request.getMaxPrice()));
                 }
 
-                return advertisementRepository.findAll(specification)
-                        .stream()
-                        .map(this::toSummaryResponse)
-                        .toList();
+                return specification;
         }
 
         /**
@@ -179,34 +219,6 @@ public class AdvertisementService {
 
                 return ids;
         }
-
-        // public AdvertisementDetailedResponse getAdvertisementDetails(Long id) {
-
-        // Advertisement ad = advertisementRepository.findById(id)
-        // .orElseThrow(() -> new ApiException(
-        // "Advertisement not found",
-        // HttpStatus.NOT_FOUND));
-
-        // List<String> imageUrls = ad.getImages()
-        // .stream()
-        // .map(image -> "/api/ads/images/" + image.getId())
-        // .toList();
-
-        // return new AdvertisementDetailedResponse(
-        // ad.getId(),
-        // ad.getTitle(),
-        // ad.getDescription(),
-        // ad.getPrice(),
-        // ad.getSeller().getUsername(),
-        // ad.getSeller().getFullName(),
-        // ad.getSeller().getPhone(),
-        // ad.getCategory().getName(),
-        // ad.getCity().getName(),
-        // ad.getStatus(),
-        // ad.getRejectionReason(),
-        // ad.getCreatedAt(),
-        // imageUrls);
-        // }
 
         public AdvertisementDetailedResponse getAdvertisementDetails(
                 Long id,
