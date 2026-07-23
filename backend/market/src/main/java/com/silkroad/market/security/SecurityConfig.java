@@ -11,6 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Configures web security for the SilkRoad marketplace backend.
+ * <p>
+ * Defines stateless JWT authentication, public endpoint access, and role-based
+ * authorization rules for admin and user operations.
+ */
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -21,6 +27,11 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    /**
+     * Provides a password encoder used to hash and verify user passwords.
+     *
+     * @return BCryptPasswordEncoder instance
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -7,15 +7,13 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
+/**
+ * OpenAPI configuration for the SilkRoad marketplace backend.
+ * <p>
+ * Declares API metadata and JWT bearer authentication for Swagger UI.
+ */
 @Configuration
-@OpenAPIDefinition(
-        info = @Info(
-                title = "SilkRoad Marketplace API",
-                version = "1.0"))
-@SecurityScheme(
-        name = "bearerAuth",
-        type = SecuritySchemeType.HTTP,
-        scheme = "bearer",
-        bearerFormat = "JWT")
+@OpenAPIDefinition(info = @Info(title = "SilkRoad Marketplace API", version = "1.0"))
+@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
 public class OpenApiConfig {
 }

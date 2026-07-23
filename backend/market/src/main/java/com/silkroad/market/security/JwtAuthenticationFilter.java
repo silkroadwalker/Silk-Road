@@ -14,6 +14,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet filter that extracts and validates JWT tokens from incoming requests.
+ * <p>
+ * When a valid token is present, the filter sets the authenticated user in
+ * the Spring Security context for downstream request handling.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

@@ -32,6 +32,12 @@ import com.silkroad.market.service.RatingService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
+/**
+ * Controller for advertisement-related REST endpoints.
+ * <p>
+ * Exposes public search operations and authenticated actions for creating,
+ * updating, deleting, and rating advertisements.
+ */
 @RestController
 @RequestMapping("/api/ads")
 public class AdvertisementController {
@@ -47,6 +53,14 @@ public class AdvertisementController {
                 this.ratingService = ratingService;
         }
 
+        /**
+         * Creates a new advertisement with uploaded images.
+         *
+         * @param authentication authenticated user context
+         * @param request        validated advertisement creation payload
+         * @return success message on creation
+         * @throws IOException if image persistence fails
+         */
         @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         @SecurityRequirement(name = "bearerAuth")
         public ResponseEntity<String> createAdvertisement(

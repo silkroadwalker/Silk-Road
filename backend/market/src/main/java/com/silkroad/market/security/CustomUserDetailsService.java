@@ -8,6 +8,13 @@ import org.springframework.stereotype.Service;
 import com.silkroad.market.entity.User;
 import com.silkroad.market.repository.UserRepository;
 
+/**
+ * Loads user details from the database for Spring Security authentication.
+ * <p>
+ * Adapts the applications {@link com.silkroad.market.entity.User} entity to
+ * the
+ * Spring Security {@link UserDetails} contract.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
