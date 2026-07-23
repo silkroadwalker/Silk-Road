@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import com.silkroad.market.dto.user.UserSummaryResponse;
 import com.silkroad.market.entity.UserStatus;
 import com.silkroad.market.repository.UserRepository;
+import com.silkroad.market.exception.ApiException;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
+import com.silkroad.market.entity.User;
 
 /**
  * Service class responsible for user management and statistics.
@@ -90,5 +94,23 @@ public class UserService {
      */
     public long getBlockedUsers() {
         return userRepository.countByStatus(UserStatus.BLOCKED);
+    }
+
+    @Transactional
+    public void blockUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+
+        user.setStatus(UserStatus.BLOCKED);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void unblockUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
+
+        user.setStatus(UserStatus.ACTIVE);
+        userRepository.save(user);
     }
 }
