@@ -24,4 +24,6 @@ public interface AdvertisementRepository
 
         List<Advertisement> findByCategoryAndStatus(Category category,
                         AdvertisementStatus status);
+
+        long countByStatus(AdvertisementStatus status);
 }

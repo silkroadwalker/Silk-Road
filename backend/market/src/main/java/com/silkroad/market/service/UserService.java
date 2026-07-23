@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.silkroad.market.dto.user.UserSummaryResponse;
+import com.silkroad.market.entity.UserStatus;
 import com.silkroad.market.repository.UserRepository;
 
 @Service
@@ -26,5 +27,17 @@ public class UserService {
                         user.getFullName(),
                         user.getStatus()))
                 .toList();
+    }
+
+    public long getTotalUsers() {
+        return userRepository.count();
+    }
+
+    public long getActiveUsers() {
+        return userRepository.countByStatus(UserStatus.ACTIVE);
+    }
+
+    public long getBlockedUsers() {
+        return userRepository.countByStatus(UserStatus.BLOCKED);
     }
 }
