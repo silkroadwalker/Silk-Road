@@ -11,6 +11,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+/**
+ * Utility service for creating and validating JSON Web Tokens (JWTs).
+ * <p>
+ * Encapsulates token generation, claim extraction, and expiration checks.
+ */
 @Service
 public class JwtService {
 
@@ -19,6 +24,13 @@ public class JwtService {
 
     private final long expirationMs = 24 * 60 * 60 * 1000;
 
+    /**
+     * Generates a JWT token for the given username and role.
+     *
+     * @param username subject of the token
+     * @param role     user role to include as a claim
+     * @return signed JWT token string
+     */
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)
